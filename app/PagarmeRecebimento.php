@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Mockery\Exception;
 use PagarMe\Client;
 
 class PagarmeRecebimento extends Model
@@ -23,40 +24,47 @@ class PagarmeRecebimento extends Model
         $continue = true;
 
         //Enquanto não ocorrer erros, continue buscando
-        while ($continue){
+        while ($continue & $page<env("PAGARME_MAX_PAGES")){
             try {
                 $page++;
 
-                $resultados[] = ['Pagina'=>$page];
-
-                $pageResults = $client->balanceOperations()->getList([
-                    "count" => 100,
+                /*$pageResults = $client->balanceOperations()->getList([
+                    "count" => 1000,
                     "page" => $page,
-                    "start_date" => "=$inicio",
                     "end_date" => "=$fim"
-                ]);
+                ]);*/
 
-                $resultados[] = ['Num Resultados'=>sizeof($pageResults)];
+
+
+                $resultados[] = ['Pagina'=>$page, 'Num Resultados'=>sizeof($pageResults)];
 
                 if(sizeof($pageResults) > 0){
-                    foreach ($pageResults as $pageResult){
-                        $resultados[] = [
-                            "dataRecebimento"=>$pageResult->date_created,
-                            "idOperacao"=>$pageResult->movement_object->id,
-                            "idTransacao" =>$pageResult->movement_object->transaction_id,
-                            "status"=>$pageResult->movement_object->status,
-                            "metodoPagamento"=> $pageResult->movement_object->payment_method,
-                            "parcela"=>$pageResult->movement_object->installment,
-                            "dataPagamento"=>$pageResult->movement_object->date_created,
-                            "entrada"=>$pageResult->movement_object->amount,
-                            "saida"=>$pageResult->movement_object->fee
-                        ];
-                    }
+                    /*foreach ($pageResults as $pageResult){
+                        $recebimento = null;
+                        try {
+                            $recebimento = [
+                                "dataRecebimento"=>$pageResult->date_created,
+                                "idOperacao"=>$pageResult->id,
+                                "idTransacao" =>$pageResult->movement_object->id,
+                                "status"=>$pageResult->movement_object->status,
+                                "metodoPagamento"=> $pageResult->movement_object->payment_method,
+                                "parcela"=>$pageResult->movement_object->installment,
+                                "dataPagamento"=>$pageResult->movement_object->payment_date,
+                                "entrada"=>$pageResult->amount,
+                                "saida"=>$pageResult->fee
+                            ];
+                            $resultados[] = $recebimento;
+                        }catch (\Exception $e){
+                            $resultados[] =[
+                                "Erro"=>$e->getMessage(),
+                                "Objeto"=>$recebimento
+                            ];
+                        }
+
+                    }*/
                 }else{
                     $continue = false;
                 }
-
-                //$continue = false;
             }catch (\Exception $e){
                 $resultados[] = ["Erro"=>$e->getMessage()];
                 $continue = false;
