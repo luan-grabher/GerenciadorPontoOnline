@@ -28,18 +28,17 @@ class PagarmeRecebimento extends Model
             try {
                 $page++;
 
-                /*$pageResults = $client->balanceOperations()->getList([
+                $pageResults = $client->balanceOperations()->getList([
                     "count" => 1000,
                     "page" => $page,
-                    "end_date" => "=$fim"
-                ]);*/
+                    "start_date" => "$inicio",
+                    "end_date" => "$fim"
+                ]);
 
-
-
-                $resultados[] = ['Pagina'=>$page, 'Num Resultados'=>sizeof($pageResults)];
+                //$resultados[] = ['Pagina'=>$page, 'Num Resultados'=>sizeof($pageResults)];
 
                 if(sizeof($pageResults) > 0){
-                    /*foreach ($pageResults as $pageResult){
+                    foreach ($pageResults as $pageResult){
                         $recebimento = null;
                         try {
                             $recebimento = [
@@ -55,18 +54,18 @@ class PagarmeRecebimento extends Model
                             ];
                             $resultados[] = $recebimento;
                         }catch (\Exception $e){
-                            $resultados[] =[
+                            /*$resultados[] =[
                                 "Erro"=>$e->getMessage(),
                                 "Objeto"=>$recebimento
-                            ];
+                            ];*/
                         }
 
-                    }*/
+                    }
                 }else{
                     $continue = false;
                 }
             }catch (\Exception $e){
-                $resultados[] = ["Erro"=>$e->getMessage()];
+                /*$resultados[] = ["Erro"=>$e->getMessage()];*/
                 $continue = false;
             }
         }
