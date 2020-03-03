@@ -24,9 +24,28 @@ class JsonRequest extends FormRequest
     public function rules()
     {
         return [
-            "inicio" => "required",//|date_format:y-m-d",
-            "fim" => "required",//|date_format:y-m-d|after:inicio",
-            "page" => "required"//|integer"
+            /***/
         ];
+    }
+
+    public function getStartEnd(){
+        $oneDay = 86400;
+
+        $start = strtotime("now");
+        $end = strtotime("now");
+
+        try {
+            $start = strtotime($this->inicio)*1000;
+        }catch(\Exception $e){
+        }
+
+        try {
+            $end = (strtotime($this->fim)+$oneDay)*1000;
+        }catch(\Exception $e){
+        }
+
+        $end = $end<$start?$start:$end;
+
+        return ["start"=>$start,"end"=>$end];
     }
 }

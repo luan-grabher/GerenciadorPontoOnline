@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\JsonRequest;
 use App\Jobs\ImportPagarmeBalanceoperations;
 use App\pagarmeRecebimento;
 use App\User;
@@ -12,15 +13,11 @@ use Symfony\Component\Process\Process;
 
 class PagarmeController extends Controller
 {
-    public function jsonBalanceOperations(Request $request){
+    public function jsonBalanceOperations(JsonRequest $request){
         try {
+            $datas = $request->getStartEnd();
 
-            $oneDay = 86400;
-
-            $inicio = strtotime($request->inicio)*1000;
-            $fim = (strtotime($request->fim)+$oneDay)*1000;
-
-            return pagarmeRecebimento::getJsonFromAPI($inicio,$fim);
+            return pagarmeRecebimento::getJsonFromAPI($datas['start'],$datas['end']);
         }catch(\Exception $e){
             return "";
         }
