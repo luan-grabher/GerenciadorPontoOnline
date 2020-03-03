@@ -15,8 +15,10 @@ class PagarmeController extends Controller
     public function jsonBalanceOperations(Request $request){
         try {
 
+            $oneDay = 86400;
+
             $inicio = strtotime($request->inicio)*1000;
-            $fim = strtotime($request->fim)*1000;
+            $fim = (strtotime($request->fim)+$oneDay)*1000;
 
             return pagarmeRecebimento::getJsonFromAPI($inicio,$fim);
         }catch(\Exception $e){

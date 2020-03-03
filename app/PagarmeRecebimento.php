@@ -16,8 +16,8 @@ class PagarmeRecebimento extends Model
 
         //Inicializa array de resultados
         $resultados = [];
-        $resultados[] = ['start'=>date("d-m-Y",$inicio),"end"=>date("d-m-Y",$fim)];
-        $resultados[] = ['start_unix'=>$inicio,"end_unix"=>$fim];
+        //$resultados[] = ['start'=>date("d-m-Y",$inicio/1000),"end"=>date("d-m-Y",$fim/1000)];
+        //$resultados[] = ['start_unix'=>$inicio,"end_unix"=>$fim];
 
         //Inicializa Pagina
         $page = 0;
@@ -72,6 +72,7 @@ class PagarmeRecebimento extends Model
 
 
 
-        return "<pre>" . json_encode($resultados, JSON_PRETTY_PRINT) . "</pre>";
+        //return "<pre>" . json_encode($resultados, JSON_PRETTY_PRINT) . "</pre>";
+        return $resultados;
     }
 }
