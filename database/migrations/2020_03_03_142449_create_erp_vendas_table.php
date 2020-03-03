@@ -21,18 +21,19 @@ class CreateErpVendasTable extends Migration
             $table->string('curso',200);
             $table->dateTime('dataRecebimento');
             $table->dateTime('dataPagamento');
-            $table->float('valorTotal');
-            $table->float("valorCursoSD");
-            $table->float("valorCursoCD");
+            $table->bigInteger('valorTotal');
+            $table->bigInteger("valorCursoSD");
+            $table->bigInteger("valorCursoCD");
             $table->string("metodoPagamento");
-            $table->integer("qxmat");
-            $table->integer("soma");
-            $table->integer("amais");
-            $table->integer("credAluno");
-            $table->integer("pgamenos");
+            $table->bigInteger("qxmat");
+            $table->bigInteger("soma");
+            $table->bigInteger("amais");
+            $table->bigInteger("credUtilizado");
+            $table->bigInteger("credAluno");
+            $table->bigInteger("pgamenos");
             $table->string("cupom");
             $table->string("afiliados");
-            $table->float("valorAfiliados");
+            $table->bigInteger("valorAfiliados");
             $table->timestamps();
         });
     }

@@ -38,7 +38,7 @@ if (env('APP_DEBUG') == 'true') {
     });
 }
 
-Route::group(['prefix'=>'json', 'middaware'=>'auth'], function (){
+Route::group(['prefix'=>'json', 'middleware'=>'auth'], function (){
     Route::group(['prefix'=>'pagarme'], function(){
         Route::get("recebimentos/{inicio}/{fim}","PagarmeController@jsonBalanceOperations")->name('json.pagarme.recebimentos');
     });
