@@ -31,8 +31,8 @@ class ErpVenda extends Model
         //Log-in in system
         if(self::getJsonFromErp_Login($client)){
             //Pick-up Row values
-            $rowValues = self::getJsonFromErp_PickupRows($client,$date_start,$date_end);
-            return "<pre>" . json_encode($rowValues, JSON_PRETTY_PRINT) . "</pre>";
+            return self::getJsonFromErp_PickupRows($client,$date_start,$date_end);
+            //return "<pre>" . json_encode($rowValues, JSON_PRETTY_PRINT) . "</pre>";
         }
     }
 
