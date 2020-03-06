@@ -29,7 +29,10 @@ class PagarmeController extends Controller
         return view('import.pagarme.recebimentos');
     }
 
-    public function pageImportRecebimentosSendForm(RangeDateRequest $request){
-        return view('import.pagarme.recebimentos');
+    public function pageImportRecebimentosStartImport(RangeDateRequest $request){
+        $messages = [];
+        $messages[] = ['type'=>'danger','text'=>'Não houve nenhum retorno'];
+
+        return view('import.pagarme.recebimentos',['messages'=> $messages]);
     }
 }

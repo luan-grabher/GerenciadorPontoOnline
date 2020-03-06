@@ -13,7 +13,7 @@ class RangeDateRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,8 +24,8 @@ class RangeDateRequest extends FormRequest
     public function rules()
     {
         return [
-            "inicio" => "date",
-            "fim" => "date"
+            "inicio" => "required|date",
+            "fim" => "required|date|after:inicio"
         ];
     }
 }

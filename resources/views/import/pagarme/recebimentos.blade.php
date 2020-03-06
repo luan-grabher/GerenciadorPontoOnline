@@ -2,11 +2,11 @@
 
 @section('content')
     <div class="col-10 mx-auto my-5 text-center">
-        <div class="alert-of-form">
-        </div>
+        @include('layouts.errors')
+        @include('layouts.messages')
 
         {!! Form::open() !!}
-        <h3>Pagarme {{__('Recebimentos')}}</h3>
+        <h3>Importar Pagarme Recebimentos</h3>
         <div class="form-group">
             {!! Form::label('Inicio:') !!}
             {!! Form::date('inicio', \Carbon\Carbon::now(),['class'=>'form-control']) !!}
