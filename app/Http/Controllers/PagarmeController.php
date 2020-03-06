@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\JsonRequest;
+use App\Http\Requests\RangeDateRequest;
 use App\Jobs\ImportPagarmeBalanceoperations;
 use App\pagarmeRecebimento;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Artisan;
+use Psy\Util\Json;
 use Symfony\Component\Process\Process;
 
 class PagarmeController extends Controller
@@ -23,7 +25,11 @@ class PagarmeController extends Controller
         }
     }
 
-    public function pageImportIndex(){
-        return view('import.pagarme.index');
+    public function pageImportRecebimentos(){
+        return view('import.pagarme.recebimentos');
+    }
+
+    public function pageImportRecebimentosSendForm(RangeDateRequest $request){
+        return view('import.pagarme.recebimentos');
     }
 }
