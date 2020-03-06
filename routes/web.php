@@ -48,5 +48,7 @@ Route::group(['prefix'=>'json', 'middleware'=>'auth'], function (){
 });
 
 Route::group(['prefix' => __('import')], function () {
-    Route::get('pagarme', 'PagarmeController@pageImportIndex')->name('import.pagarme');
+    Route::group(['prefix' => 'pagarme'], function(){
+        Route::get('recebimentos', 'PagarmeController@pageImportIndex')->name('import.pagarme.recebimentos');
+    });
 });

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-100">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,8 +19,16 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
-<body>
-<div id="app">
+<body class="h-100 overflow-hidden">
+
+@auth
+    <div id="menu" class="float-left h-100 m-0 p-0 col-2">
+        @include('layouts.menu')
+    </div>
+@endauth
+
+<div id="app"
+     class="float-left {{auth()->check()?"col-10 h-100 p-0 m-0":""}}" >
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
@@ -72,12 +80,10 @@
         </div>
     </nav>
 
-    @auth
-        @include('layouts.menu')
-    @endauth
-    <main class="py-4">
+    <main class="h-100">
         @yield('content')
     </main>
+
 </div>
 </body>
 </html>

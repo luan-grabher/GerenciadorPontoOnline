@@ -1,18 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header text-center">
-                        @yield('card-header')
-                    </div>
+    <iframe id="iframe-main" src="" class="h-100 w-100 border-0 overflow-hidden">
 
-                    <div class="card-body">
-                        @yield('card-body')
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </iframe>
 @endsection
