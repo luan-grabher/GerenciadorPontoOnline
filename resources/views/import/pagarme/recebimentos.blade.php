@@ -7,6 +7,7 @@
 
         {!! Form::open() !!}
         <h3>Importar Pagarme Recebimentos</h3>
+        <div class="alert alert-info">Depois que clicar em 'Importar' a página poderá demorar um pouco para carregar. NÃO FECHE A ABA OU O NAVEGADOR NESTE MOMENTO.</div>
         <div class="form-group">
             {!! Form::label('Inicio:') !!}
             {!! Form::date('inicio', \Carbon\Carbon::now(),['class'=>'form-control']) !!}

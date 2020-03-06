@@ -30,9 +30,14 @@ class PagarmeController extends Controller
     }
 
     public function pageImportRecebimentosStartImport(RangeDateRequest $request){
-        $messages = [];
-        $messages[] = ['type'=>'danger','text'=>'Não houve nenhum retorno'];
+        $dates = $request->getStartEnd();
 
-        return view('import.pagarme.recebimentos',['messages'=> $messages]);
+
+        return view(
+            'import.pagarme.recebimentos',
+            [
+                'messages'=> pagarmeRecebimento::importDataFromAPIToDatabase($dates['start'],$dates['end'])
+            ]
+        );
     }
 }

@@ -8,7 +8,7 @@ use PagarMe\Client;
 
 class PagarmeRecebimento extends Model
 {
-    public static function getJsonFromAPI(int $inicio,int $fim){
+    public static function getJsonFromAPI(int $start, int $end){
         ini_set ('max_execution_time',  -1);
 
         //Inicializa cliente
@@ -31,8 +31,8 @@ class PagarmeRecebimento extends Model
                 $pageResults = $client->balanceOperations()->getList([
                     "count" => 1000,
                     "page" => $page,
-                    "start_date" => "$inicio",
-                    "end_date" => "$fim"
+                    "start_date" => "$start",
+                    "end_date" => "$end"
                 ]);
 
                 //$resultados[] = ['Pagina'=>$page, 'Num Resultados'=>sizeof($pageResults)];
@@ -74,5 +74,22 @@ class PagarmeRecebimento extends Model
 
         //return "<pre>" . json_encode($resultados, JSON_PRETTY_PRINT) . "</pre>";
         return $resultados;
+    }
+
+    public static function importDataFromAPIToDatabase(int $start, int $end): array {
+        $messages = new Messages();
+        $messages->add('iniciando');
+
+        try {
+            $data = self::importDataFromAPIToDatabase($start,$end);
+
+            foreach ($data as $recebimento){
+
+            }
+        }catch (\Exception $e){
+            $messages[] = ['type'=>'danger','text'=>'Ocorreu um erro desconhecido: ' . $e->getMessage()];
+        }
+
+        return $messages->getArray();
     }
 }

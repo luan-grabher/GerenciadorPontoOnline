@@ -28,4 +28,25 @@ class RangeDateRequest extends FormRequest
             "fim" => "required|date|after:inicio"
         ];
     }
+
+    public function getStartEnd(){
+        $oneDay = 86400;
+
+        $start = strtotime("now");
+        $end = strtotime("now");
+
+        try {
+            $start = strtotime($this->input('inicio'))*1000;
+        }catch(\Exception $e){
+        }
+
+        try {
+            $end = (strtotime($this->input('fim'))+$oneDay)*1000;
+        }catch(\Exception $e){
+        }
+
+        $end = $end<$start?$start:$end;
+
+        return ["start"=>$start,"end"=>$end];
+    }
 }
