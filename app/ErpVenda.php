@@ -23,20 +23,21 @@ class ErpVenda extends Model
     public static function getJsonFromErp(int $start, int $end)
     {
         //Prepare function
-        $date_start = date("Y-m-d H:i:s",($start/1000));
-        $date_end = date("Y-m-d H:i:s",($end/1000));
+        $date_start = date("Y-m-d H:i:s", ($start / 1000));
+        $date_end = date("Y-m-d H:i:s", ($end / 1000));
 
         $client = new Client();
 
         //Log-in in system
-        if(self::getJsonFromErp_Login($client)){
+        if (self::getJsonFromErp_Login($client)) {
             //Pick-up Row values
-            return self::getJsonFromErp_PickupRows($client,$date_start,$date_end);
+            return self::getJsonFromErp_PickupRows($client, $date_start, $date_end);
             //return "<pre>" . json_encode($rowValues, JSON_PRETTY_PRINT) . "</pre>";
         }
     }
 
-    private static function getJsonFromErp_Login(Client $client):bool{
+    private static function getJsonFromErp_Login(Client $client): bool
+    {
         try {
             $crawler = $client->request('GET', env("ERP_URL_HOME"));
             $form = $crawler->selectButton(self::config()['nameButtonLogin'])->form();
@@ -45,34 +46,34 @@ class ErpVenda extends Model
             $crawler = $client->submit($form);
 
             return true;
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return false;
         }
     }
 
-    private static function getJsonFromErp_PickupRows(Client $client, string $date_start, string $date_end):array {
+    private static function getJsonFromErp_PickupRows(Client $client, string $date_start, string $date_end): array
+    {
+        $cols = [];
         try {
-            $cols = [];
-
             $page = 0;
             $continue = true;
-            while ($continue & $page < env("ERP_MAX_PAGES")){
+            while ($continue & $page < env("ERP_MAX_PAGES")) {
                 $page++;
-                $crawler = $client->request("POST",env("ERP_URL_REPORT") . "?dataInicio=$date_start&dataFinal=$date_end&page=$page");
+                $crawler = $client->request("POST", env("ERP_URL_REPORT") . "?dataInicio=$date_start&dataFinal=$date_end&page=$page");
                 $rowsElements = $crawler->filter(self::config()['css_rows']);
-                if($rowsElements->count() > 0){
+                if ($rowsElements->count() > 0) {
                     //for each loop in rows
-                    $rowsElements->each(function(Crawler $node,$i) use (&$cols){
+                    $rowsElements->each(function (Crawler $node, $i) use (&$cols) {
                         $colsElements = $node->filter(self::config()['css_colls']);
 
                         $cols[] = [
                             "matricula" => $colsElements->eq(0)->text(),
-                            "tid"=> $colsElements->eq(1)->text(),
-                            "curso_id"=> $colsElements->eq(2)->text(),
-                            "aluno"=> $colsElements->eq(4)->text(),
-                            "curso"=> $colsElements->eq(3)->text(),
-                            "dataRecebimento"=> $colsElements->eq(5)->text(),
-                            "dataPagamento"=> $colsElements->eq(6)->text(),
+                            "tid" => $colsElements->eq(1)->text(),
+                            "curso_id" => $colsElements->eq(2)->text(),
+                            "aluno" => $colsElements->eq(4)->text(),
+                            "curso" => $colsElements->eq(3)->text(),
+                            "dataRecebimento" => $colsElements->eq(5)->text(),
+                            "dataPagamento" => $colsElements->eq(6)->text(),
                             "valorTotal" => $colsElements->eq(7)->text(),
                             "valorCursoSD" => $colsElements->eq(8)->text(),
                             "valorCursoCD" => $colsElements->eq(9)->text(),
@@ -88,14 +89,14 @@ class ErpVenda extends Model
                             "valorAfiliado" => $colsElements->eq(19)->text()
                         ];
                     });
-                }else{
+                } else {
                     $continue = false;
                 }
             }
-
-            return $cols;
-        }catch (\Exception $e){
-            return ["Erro"=>$e->getMessage()];
+        } catch (\Exception $e) {
+            //return ["Erro"=>$e->getMessage()];
         }
+        return $cols;
+
     }
 }

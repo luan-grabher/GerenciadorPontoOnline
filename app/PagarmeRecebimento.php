@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Mockery\Exception;
 use PagarMe\Client;
 
 class PagarmeRecebimento extends Model
@@ -47,7 +46,7 @@ class PagarmeRecebimento extends Model
                                 "idTransacao" =>$pageResult->movement_object->id,
                                 "status"=>$pageResult->movement_object->status,
                                 "metodoPagamento"=> $pageResult->movement_object->payment_method,
-                                "parcela"=>$pageResult->movement_object->installment,
+                                "parcela"=>$pageResult->movement_object->installment==null?1:$pageResult->movement_object->installment,
                                 "dataPagamento"=>$pageResult->movement_object->payment_date,
                                 "entrada"=>$pageResult->amount,
                                 "saida"=>$pageResult->fee
@@ -78,16 +77,40 @@ class PagarmeRecebimento extends Model
 
     public static function importDataFromAPIToDatabase(int $start, int $end): array {
         $messages = new Messages();
-        $messages->add('iniciando');
-
         try {
-            $data = self::importDataFromAPIToDatabase($start,$end);
 
-            foreach ($data as $recebimento){
+            //Buscar dados da api
+            $data = self::getJsonFromAPI($start,$end);
 
+            //imprimir dados da api
+            foreach ($data as $recebimentoAPI){
+                $recebimento = PagarmeRecebimento::where('idOperacao',$recebimentoAPI['idOperacao'])->first();
+
+                $recebimento = !$recebimento == null?$recebimento:new PagarmeRecebimento();
+
+                $recebimento->idOperacao = $recebimentoAPI['idOperacao'];
+                $recebimento->idTransacao = $recebimentoAPI['idTransacao'];
+                $recebimento->status = $recebimentoAPI['status'];
+                $recebimento->metodoPagamento = $recebimentoAPI['metodoPagamento'];
+                $recebimento->parcela = $recebimentoAPI['parcela'];
+                $recebimento->idTransacao = $recebimentoAPI['idTransacao'];
+
+                $dataRecebimento = new \DateTime($recebimentoAPI['dataRecebimento']);
+                $dataPagamento = new \DateTime($recebimentoAPI['dataPagamento']);
+                $recebimento->dataRecebimento = $dataRecebimento;
+                $recebimento->dataPagamento = $dataPagamento;
+
+
+                $recebimento->entrada = $recebimentoAPI['entrada'];
+                $recebimento->saida = $recebimentoAPI['saida'];
+                $recebimento->save();
             }
+
+            $messages->add("Importação concluída! Operações importadas/atualizadas: " . sizeof($data),'success');
+
         }catch (\Exception $e){
-            $messages[] = ['type'=>'danger','text'=>'Ocorreu um erro desconhecido: ' . $e->getMessage()];
+            //Exibir erro
+            $messages->add('Ocorreu um erro desconhecido: ' . $e->getMessage(),'danger');
         }
 
         return $messages->getArray();
