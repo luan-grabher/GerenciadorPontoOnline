@@ -57,3 +57,14 @@ Route::group(['prefix' => __('import')], function () {
         Route::post('vendas', 'ErpController@pageImportVendasStartImport')->name('import.erp.vendasStartImport');
     });
 });
+
+Route::group(['prefix' => __('consult')], function () {
+    Route::group(['prefix' => 'pagarme'], function(){
+        Route::get('recebimentos', 'PagarmeController@pageImportRecebimentos')->name('consult.pagarme.recebimentos');
+        Route::post('recebimentos', 'PagarmeController@pageImportRecebimentosStartImport')->name('consult.pagarme.recebimentosStartImport');
+    });
+    Route::group(['prefix' => 'erp'], function(){
+        Route::get('vendas', 'ErpController@pageImportVendas')->name('consult.erp.vendas');
+        Route::post('vendas', 'ErpController@pageImportVendasStartImport')->name('consult.erp.vendasStartImport');
+    });
+});
