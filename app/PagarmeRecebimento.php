@@ -77,8 +77,8 @@ class PagarmeRecebimento extends Model
 
     public static function importDataFromAPIToDatabase(int $start, int $end): array {
         $messages = new Messages();
-        try {
 
+        try {
             //Buscar dados da api
             $data = self::getJsonFromAPI($start,$end);
 

@@ -32,7 +32,6 @@ class PagarmeController extends Controller
     public function pageImportRecebimentosStartImport(RangeDateRequest $request){
         $dates = $request->getStartEnd();
 
-
         return view(
             'import.pagarme.recebimentos',
             [

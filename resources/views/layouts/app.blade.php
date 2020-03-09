@@ -10,7 +10,7 @@
 @endauth
 
 <div id="app"
-     class="float-left {{auth()->check()?"col-10 h-100 p-0 m-0":""}}" >
+     class="{{auth()->check()?"float-left col-10 h-100 p-0 m-0":""}}" >
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">

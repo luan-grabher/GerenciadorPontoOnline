@@ -86,7 +86,7 @@ class ErpVenda extends Model
                             "pgamenos" => $colsElements->eq(16)->text(),
                             "cupom" => $colsElements->eq(17)->text(),
                             "afiliados" => $colsElements->eq(18)->text(),
-                            "valorAfiliado" => $colsElements->eq(19)->text()
+                            "valorAfiliados" => $colsElements->eq(19)->text()
                         ];
                     });
                 } else {
@@ -98,5 +98,62 @@ class ErpVenda extends Model
         }
         return $cols;
 
+    }
+
+    public static function importDataFromERPToDatabase(int $start, int $end): array
+    {
+        $messages = new Messages();
+        try {
+
+            //Buscar dados da api
+            $data = self::getJsonFromErp($start, $end);
+
+            //imprimir dados da api
+            foreach ($data as $vendaAPI) {
+                $venda = ErpVenda::where(
+                    [
+                        ['tid', '=', $vendaAPI['tid']],
+                        ['curso_id', '=', $vendaAPI['curso_id']],
+                        ['matricula', '=', $vendaAPI['matricula']]
+                    ])->first();
+
+                $venda = !$venda == null ? $venda : new ErpVenda();
+
+                $venda->matricula = $vendaAPI['matricula'];
+                $venda->tid = $vendaAPI['tid']==""?0:$vendaAPI['tid'];
+                $venda->curso_id = $vendaAPI['curso_id'];
+                $venda->aluno = $vendaAPI['aluno'];
+                $venda->curso = $vendaAPI['curso'];
+
+                $dataRecebimento = new \DateTime($vendaAPI['dataRecebimento']);
+                $dataPagamento = new \DateTime($vendaAPI['dataPagamento']);
+                $venda->dataRecebimento = $dataRecebimento;
+                $venda->dataPagamento = $dataPagamento;
+
+                $venda->valorTotal = (int) filter_var($vendaAPI['valorTotal'], FILTER_SANITIZE_NUMBER_INT);
+                $venda->valorCursoSD = (int) filter_var($vendaAPI['valorCursoSD'], FILTER_SANITIZE_NUMBER_INT);
+                $venda->valorCursoCD = (int) filter_var($vendaAPI['valorCursoCD'], FILTER_SANITIZE_NUMBER_INT);
+                $venda->metodoPagamento = $vendaAPI['metodoPagamento'];
+                $venda->qxmat = $vendaAPI['qxmat'];
+                $venda->soma = $vendaAPI['soma'];
+                $venda->amais = $vendaAPI['amais'];
+                $venda->credUtilizado = $vendaAPI['credUtilizado'];
+                $venda->credAluno = $vendaAPI['credAluno'];
+                $venda->pgamenos = (int) filter_var($vendaAPI['pgamenos'] ."0",FILTER_SANITIZE_NUMBER_INT);
+                $venda->cupom = $vendaAPI['cupom'];
+                $venda->afiliados = $vendaAPI['afiliados'];
+                $venda->valorAfiliados = (int) filter_var($vendaAPI['valorAfiliados'], FILTER_SANITIZE_NUMBER_INT);
+
+                $venda->save();
+            }
+
+            $messages->add("Importação concluída! Operações importadas/atualizadas: " . sizeof($data), 'success');
+
+        } catch (\Exception $e) {
+            //Exibir erro
+            $messages->add('Ocorreu um erro desconhecido: ' . $e->getMessage(), 'danger');
+        }
+
+        return $messages->getArray();
     }
 }

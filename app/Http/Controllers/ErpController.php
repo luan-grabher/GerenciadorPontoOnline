@@ -21,11 +21,10 @@ class ErpController extends Controller
     public function pageImportVendasStartImport(RangeDateRequest $request){
         $dates = $request->getStartEnd();
 
-
         return view(
             'import.erp.vendas',
             [
-                'messages'=> ErpVenda::importDataFromAPIToDatabase($dates['start'],$dates['end'])
+                'messages'=> ErpVenda::importDataFromERPToDatabase($dates['start'],$dates['end'])
             ]
         );
     }

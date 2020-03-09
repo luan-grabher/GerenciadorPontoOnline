@@ -17,8 +17,9 @@ class CreateErpVendasTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('matricula');
             $table->bigInteger('tid');
+            $table->bigInteger('curso_id');
             $table->string('aluno',200);
-            $table->string('curso',200);
+            $table->text('curso');
             $table->dateTime('dataRecebimento');
             $table->dateTime('dataPagamento');
             $table->bigInteger('valorTotal');

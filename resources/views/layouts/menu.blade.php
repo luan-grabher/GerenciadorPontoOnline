@@ -8,13 +8,13 @@
     </a>
     <div id="import-options"
          class="collapse">
-        <a href="javascript:$('iframe').attr('src','{{route('import.pagarme.recebimentos')}}')"
+        <a href="javascript:$('#iframe-main').attr('src','{{route('import.pagarme.recebimentos')}}')"
            class="list-group-item list-group-item-action rounded-0 border-bottom pl-5">
             Pagarme Recebimetnos
         </a>
-        <a href="javascript:alert(1)"
+        <a href="javascript:$('#iframe-main').attr('src','{{route('import.erp.vendas')}}')"
            class="list-group-item list-group-item-action rounded-0 border-bottom  pl-5">
-            ERP
+            ERP Vendas
         </a>
     </div>
 </div>
