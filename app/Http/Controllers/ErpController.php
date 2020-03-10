@@ -28,4 +28,14 @@ class ErpController extends Controller
             ]
         );
     }
+
+    public function pageConsultVendas(){
+        return view('consult.erp.vendas');
+    }
+
+    public function pageConsultVendasRequest(RangeDateRequest $request){
+        $dates = $request->getStartEnd();
+        $sales = ErpVenda::whereBetween('dataPagamento',[$dates['start'],$dates['end']])->get();
+        return view('consult.erp.vendas',['sales'=>$sales->toJson()]);
+    }
 }
