@@ -37,6 +37,7 @@
             ERP Vendas
         </a>
     </div>
+
     <a href="" data-toggle="collapse" data-target="#consult-options"
        class="list-group-item list-group-item-action bg-secondary text-light rounded-0 border-bottom">
         {{ucfirst(__('Consultar'))}}
@@ -52,4 +53,17 @@
             ERP Vendas
         </a>
     </div>
+
+    <a href="" data-toggle="collapse" data-target="#analysis-options"
+       class="list-group-item list-group-item-action bg-secondary text-light rounded-0 border-bottom">
+        {{ucfirst(__('Análises'))}}
+    </a>
+    <div id="analysis-options"
+         class="collapse">
+        <a href="javascript:$('#iframe-main').attr('src','{{route('analysis.totals.tid')}}')"
+           class="list-group-item list-group-item-action rounded-0 border-bottom pl-5">
+            TID
+        </a>
+    </div>
+
 </div>

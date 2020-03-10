@@ -68,3 +68,12 @@ Route::group(['prefix' => __('consult')], function () {
         Route::post('vendas', 'ErpController@pageConsultVendasRequest')->name('consult.erp.vendasRequest');
     });
 });
+
+Route::group(['prefix' => __('analysis')], function () {
+    Route::group(['prefix' => 'totals'], function(){
+        Route::group(['prefix'=>'tid'], function(){
+            Route::get('', function(){return view('layouts.searchWithRange',['title'=>'Totais TID']);})->name('analysis.totals.tid');
+            Route::post('', 'AnalysisController@getTotalTid')->name('analysis.totals.tid.get');
+        });
+    });
+});
