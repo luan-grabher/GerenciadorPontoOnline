@@ -39,4 +39,33 @@ class PagarmeController extends Controller
             ]
         );
     }
+
+    public function pageConsultRecebimentos()
+    {
+        return view('layouts.consult',['title'=>"Pagarme Consultar Recebimentos"]);
+    }
+
+    public function pageConsultRecebimentosRequest(RangeDateRequest $request)
+    {
+        $dates = [
+            'start'=>
+                date("Y-m-d",strtotime($request->input('inicio'))),
+            'end'=>
+                date("Y-m-d",strtotime($request->input('fim')))
+        ];
+        $sales = PagarmeRecebimento::
+        whereDate(
+            'dataRecebimento', ">=", $dates['start'])->
+        whereDate(
+            'dataRecebimento', "<", $dates['end']
+        )->get();
+        return view('layouts.consult',
+            ['title'=>'Pagarme Consultar Recebimentos',
+                'results' => $sales->toArray(),
+                'filters'=>[
+                    'Início'=>$dates['start'],
+                    'Fim'=>$dates['end'],
+                ]
+            ]);
+    }
 }

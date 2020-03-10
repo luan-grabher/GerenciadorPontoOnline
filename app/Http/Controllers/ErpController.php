@@ -34,16 +34,16 @@ class ErpController extends Controller
 
     public function pageConsultVendas()
     {
-        return view('consult.erp.vendas');
+        return view('layouts.consult',['title'=>"ERP Consultar Vendas"]);
     }
 
     public function pageConsultVendasRequest(RangeDateRequest $request)
     {
         $dates = [
             'start'=>
-                date("Y-d-m",strtotime($request->input('inicio'))),
+                date("Y-m-d",strtotime($request->input('inicio'))),
             'end'=>
-                date("Y-d-m",strtotime($request->input('fim')))
+                date("Y-m-d",strtotime($request->input('fim')))
         ];
         $sales = ErpVenda::
         whereDate(
@@ -51,6 +51,13 @@ class ErpController extends Controller
         whereDate(
             'dataPagamento', "<", $dates['end']
         )->get();
-        return view('consult.erp.vendas', ['results' => $sales->toArray(),'filters'=>['dates'=>$dates]]);
+        return view('layouts.consult',
+            ['title'=>'ERP Consultar Vendas',
+                'results' => $sales->toArray(),
+                'filters'=>[
+                    'Início'=>$dates['start'],
+                    'Fim'=>$dates['end'],
+                ]
+            ]);
     }
 }

@@ -28,11 +28,9 @@
             @if(isset($filters))
                 <div id="filters" class="col-10 mx-auto text-center">
                     <h5 class="font-weight-bold">Filtros Utilizados:</h5>
-                    @if(isset($filters['dates']))
-                        Inicio: {{$filters['dates']['start']}}
-                        |
-                        Fim: {{$filters['dates']['end']}}
-                    @endif
+                    @foreach(array_keys($filters) as $filterName)
+                        <div class="badge badge-lg badge-info">{{$filterName}} : {{$filters[$filterName]}}</div>
+                    @endforeach
                 </div>
             @endif
             @if(isset($results))
