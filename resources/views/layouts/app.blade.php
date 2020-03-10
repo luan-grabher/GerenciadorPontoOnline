@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-100">
 @include('head')
-<body class="h-100 overflow-hidden">
+<body class="h-100">
 
 @auth
     <div id="menu" class="float-left h-100 m-0 p-0 col-2">
@@ -10,8 +10,8 @@
 @endauth
 
 <div id="app"
-     class="{{auth()->check()?"float-left col-10 h-100 p-0 m-0":""}}" >
-    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+     class="{{auth()->check()?"float-left col-10 h-100 p-0 m-0 overflow-auto":""}}" >
+    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm {{auth()->check()?"d-none":""}}">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
                 {{ config('app.name', 'Laravel') }}

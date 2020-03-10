@@ -26,15 +26,17 @@ class PagarmeController extends Controller
     }
 
     public function pageImportRecebimentos(){
-        return view('import.pagarme.recebimentos');
+        return view('layouts.import',['title'=>"Importar Pagarme Recebimentos",'button_name' => "Importar"]);
     }
 
     public function pageImportRecebimentosStartImport(RangeDateRequest $request){
         $dates = $request->getStartEnd();
 
         return view(
-            'import.pagarme.recebimentos',
+            'layouts.import',
             [
+                'title'=>"Importar Pagarme Recebimentos",
+                'button_name' => "Importar",
                 'messages'=> pagarmeRecebimento::importDataFromAPIToDatabase($dates['start'],$dates['end'])
             ]
         );

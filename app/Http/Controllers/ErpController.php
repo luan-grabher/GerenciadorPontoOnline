@@ -17,7 +17,7 @@ class ErpController extends Controller
 
     public function pageImportVendas()
     {
-        return view('import.erp.vendas');
+        return view('layouts.import',['title'=>"Importar ERP Vendas",'button_name' => "Importar"]);
     }
 
     public function pageImportVendasStartImport(RangeDateRequest $request)
@@ -25,8 +25,10 @@ class ErpController extends Controller
         $dates = $request->getStartEnd();
 
         return view(
-            'import.erp.vendas',
+            'layouts.import',
             [
+                'title'=>"Importar ERP Vendas",
+                'button_name' => "Importar",
                 'messages' => ErpVenda::importDataFromERPToDatabase($dates['start'], $dates['end'])
             ]
         );
@@ -56,7 +58,7 @@ class ErpController extends Controller
                 'results' => $sales->toArray(),
                 'filters'=>[
                     'Início'=>$dates['start'],
-                    'Fim'=>$dates['end'],
+                    'Fim'=>$dates['end']
                 ]
             ]);
     }

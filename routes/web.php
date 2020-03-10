@@ -61,10 +61,10 @@ Route::group(['prefix' => __('import')], function () {
 Route::group(['prefix' => __('consult')], function () {
     Route::group(['prefix' => 'pagarme'], function(){
         Route::get('recebimentos', 'PagarmeController@pageConsultRecebimentos')->name('consult.pagarme.recebimentos');
-        Route::post('recebimentos', 'PagarmeController@pageConsultRecebimentos')->name('consult.pagarme.recebimentos');
+        Route::post('recebimentos', 'PagarmeController@pageConsultRecebimentosRequest')->name('consult.pagarme.recebimentosRequest');
     });
     Route::group(['prefix' => 'erp'], function(){
         Route::get('vendas', 'ErpController@pageConsultVendas')->name('consult.erp.vendas');
-        Route::post('vendas', 'ErpController@pageConsultVendasRequest')->name('consult.erp.vendas');
+        Route::post('vendas', 'ErpController@pageConsultVendasRequest')->name('consult.erp.vendasRequest');
     });
 });

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DateTime;
 use Goutte\Client;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\DomCrawler\Crawler;
@@ -125,8 +126,8 @@ class ErpVenda extends Model
                 $venda->aluno = $vendaAPI['aluno'];
                 $venda->curso = $vendaAPI['curso'];
 
-                $dataRecebimento = new \DateTime($vendaAPI['dataRecebimento']);
-                $dataPagamento = new \DateTime($vendaAPI['dataPagamento']);
+                $dataRecebimento = DateTime::createFromFormat('d/m/Y H:i:s',$vendaAPI['dataRecebimento']);
+                $dataPagamento = DateTime::createFromFormat('d/m/Y H:i:s',$vendaAPI['dataPagamento']);
                 $venda->dataRecebimento = $dataRecebimento;
                 $venda->dataPagamento = $dataPagamento;
 

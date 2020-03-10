@@ -1,6 +1,6 @@
 <div class="table-responsive">
     <table id="table-result" class="table table-dark table-hover">
-        @if(isset($data))
+        @if(isset($data) && sizeof($data) > 0)
             <thead>
                 <tr>
                     @foreach(array_keys($data[0]) as $collumn)
