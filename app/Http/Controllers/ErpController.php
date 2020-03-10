@@ -9,33 +9,48 @@ use Illuminate\Http\Request;
 
 class ErpController extends Controller
 {
-    public function jsonVendas(JsonRequest $request){
+    public function jsonVendas(JsonRequest $request)
+    {
         $datas = $request->getStartEnd();
-        return ErpVenda::getJsonFromErp($datas['start'],$datas['end']);
+        return ErpVenda::getJsonFromErp($datas['start'], $datas['end']);
     }
 
-    public function pageImportVendas(){
+    public function pageImportVendas()
+    {
         return view('import.erp.vendas');
     }
 
-    public function pageImportVendasStartImport(RangeDateRequest $request){
+    public function pageImportVendasStartImport(RangeDateRequest $request)
+    {
         $dates = $request->getStartEnd();
 
         return view(
             'import.erp.vendas',
             [
-                'messages'=> ErpVenda::importDataFromERPToDatabase($dates['start'],$dates['end'])
+                'messages' => ErpVenda::importDataFromERPToDatabase($dates['start'], $dates['end'])
             ]
         );
     }
 
-    public function pageConsultVendas(){
+    public function pageConsultVendas()
+    {
         return view('consult.erp.vendas');
     }
 
-    public function pageConsultVendasRequest(RangeDateRequest $request){
-        $dates = $request->getStartEnd();
-        $sales = ErpVenda::whereBetween('dataPagamento',[$dates['start'],$dates['end']])->get();
-        return view('consult.erp.vendas',['sales'=>$sales->toJson()]);
+    public function pageConsultVendasRequest(RangeDateRequest $request)
+    {
+        $dates = [
+            'start'=>
+                date("Y-d-m",strtotime($request->input('inicio'))),
+            'end'=>
+                date("Y-d-m",strtotime($request->input('fim')))
+        ];
+        $sales = ErpVenda::
+        whereDate(
+            'dataPagamento', ">=", $dates['start'])->
+        whereDate(
+            'dataPagamento', "<", $dates['end']
+        )->get();
+        return view('consult.erp.vendas', ['results' => $sales->toArray(),'filters'=>['dates'=>$dates]]);
     }
 }
