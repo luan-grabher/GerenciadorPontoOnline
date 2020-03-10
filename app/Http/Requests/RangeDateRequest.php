@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class JsonRequest extends FormRequest
+class RangeDateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,8 @@ class JsonRequest extends FormRequest
     public function rules()
     {
         return [
-            /***/
+            "inicio" => "required|date",
+            "fim" => "required|date|after:inicio"
         ];
     }
 
@@ -35,12 +36,12 @@ class JsonRequest extends FormRequest
         $end = strtotime("now");
 
         try {
-            $start = strtotime($this->inicio)*1000;
+            $start = strtotime($this->input('inicio'))*1000;
         }catch(\Exception $e){
         }
 
         try {
-            $end = (strtotime($this->fim)+$oneDay)*1000;
+            $end = (strtotime($this->input('fim'))+$oneDay)*1000;
         }catch(\Exception $e){
         }
 

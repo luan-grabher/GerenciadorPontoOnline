@@ -38,12 +38,33 @@ if (env('APP_DEBUG') == 'true') {
     });
 }
 
-Route::group(['prefix'=>'json', 'middaware'=>'auth'], function (){
+Route::group(['prefix'=>'json', 'middleware'=>'auth'], function (){
     Route::group(['prefix'=>'pagarme'], function(){
         Route::get("recebimentos/{inicio}/{fim}","PagarmeController@jsonBalanceOperations")->name('json.pagarme.recebimentos');
+    });
+    Route::group(['prefix'=>'erp'],function(){
+        Route::get("vendas/{inicio}/{fim}","ErpController@jsonVendas")->name('json.erp.vendas');
     });
 });
 
 Route::group(['prefix' => __('import')], function () {
-    Route::get('pagarme', 'PagarmeController@pageImportIndex')->name('import.pagarme');
+    Route::group(['prefix' => 'pagarme'], function(){
+        Route::get('recebimentos', 'PagarmeController@pageImportRecebimentos')->name('import.pagarme.recebimentos');
+        Route::post('recebimentos', 'PagarmeController@pageImportRecebimentosStartImport')->name('import.pagarme.recebimentosStartImport');
+    });
+    Route::group(['prefix' => 'erp'], function(){
+        Route::get('vendas', 'ErpController@pageImportVendas')->name('import.erp.vendas');
+        Route::post('vendas', 'ErpController@pageImportVendasStartImport')->name('import.erp.vendasStartImport');
+    });
+});
+
+Route::group(['prefix' => __('consult')], function () {
+    Route::group(['prefix' => 'pagarme'], function(){
+        Route::get('recebimentos', 'PagarmeController@pageImportRecebimentos')->name('consult.pagarme.recebimentos');
+        Route::post('recebimentos', 'PagarmeController@pageImportRecebimentosStartImport')->name('consult.pagarme.recebimentosStartImport');
+    });
+    Route::group(['prefix' => 'erp'], function(){
+        Route::get('vendas', 'ErpController@pageImportVendas')->name('consult.erp.vendas');
+        Route::post('vendas', 'ErpController@pageImportVendasStartImport')->name('consult.erp.vendasStartImport');
+    });
 });

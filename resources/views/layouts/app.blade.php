@@ -1,26 +1,16 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-100">
+@include('head')
+<body class="h-100 overflow-hidden">
 
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@auth
+    <div id="menu" class="float-left h-100 m-0 p-0 col-2">
+        @include('layouts.menu')
+    </div>
+@endauth
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-</head>
-<body>
-<div id="app">
+<div id="app"
+     class="{{auth()->check()?"float-left col-10 h-100 p-0 m-0":""}}" >
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="{{ url('/') }}">
@@ -72,12 +62,10 @@
         </div>
     </nav>
 
-    @auth
-        @include('layouts.menu')
-    @endauth
-    <main class="py-4">
+    <main class="h-100">
         @yield('content')
     </main>
+
 </div>
 </body>
 </html>
