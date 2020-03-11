@@ -54,7 +54,7 @@ class PagarmeImport extends Model
                             foreach ($this->objectAttributes as $objectAttribute){
                                 if($objectAttribute instanceof PagarmeObjectAttribute){
                                     $vectorValue = self::getVector($r,$objectAttribute->getRouteFor());
-                                    $valueForObject = $vectorValue != null && !is_array($vectorValue)?$vectorValue:$objectAttribute->getDefault();
+                                    $valueForObject = $vectorValue != null && !is_array($vectorValue) && !is_object($vectorValue)?$vectorValue:$objectAttribute->getDefault();
 
                                     $add[$objectAttribute->getName()] = $valueForObject;
                                 }

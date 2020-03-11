@@ -10,20 +10,20 @@ class PagarmeVenda extends Model
     public static function getFromAPI(int $start, int $end): array
     {
         $pagarmeImport = new PagarmeImport(
-            "balanceOperations",
+            "transactions",
             [
-                "start_date" => "$start",
-                "end_date" => "$end"
+                "date_created" => [">=$start","<$end"]
             ],
             [
-                new PagarmeObjectAttribute("dataRecebimento", ['date_created']),
-                new PagarmeObjectAttribute("idOperacao", ['id']),
-                new PagarmeObjectAttribute("idTransacao", ['movement_object', 'id']),
-                new PagarmeObjectAttribute("status", ['movement_object', 'status']),
-                new PagarmeObjectAttribute("parcela", ['movement_object', 'installment'], 1),
-                new PagarmeObjectAttribute("dataPagamento", ['movement_object', 'payment_date']),
-                new PagarmeObjectAttribute("entrada", ['amount'],0),
-                new PagarmeObjectAttribute("saida", ['fee'],0)
+                new PagarmeObjectAttribute("tid", ['tid'],0),
+                new PagarmeObjectAttribute("cliente", ['customer','name'],0),
+                new PagarmeObjectAttribute("status", ['status']),
+                new PagarmeObjectAttribute("dataPagamento", ['date_created']),
+                new PagarmeObjectAttribute("metodoPagamento", ['payment_method']),
+                new PagarmeObjectAttribute("parcelas", ['installments']),
+                new PagarmeObjectAttribute("valor", ['amount'],0),
+                new PagarmeObjectAttribute("valorAutorizado", ['authorized_amount'],0),
+                new PagarmeObjectAttribute("valorPago", ['paid_amount'],0)
             ]
         );
         $pagarmeImport->import();
@@ -37,30 +37,28 @@ class PagarmeVenda extends Model
 
         try {
             //Buscar dados da api
-            $data = self::getJsonFromAPI($start,$end);
+            $data = self::getFromAPI($start,$end);
 
             //imprimir dados da api
-            foreach ($data as $recebimentoAPI){
-                $recebimento = PagarmeRecebimento::where('idOperacao',$recebimentoAPI['idOperacao'])->first();
+            foreach ($data as $d){
+                $db = PagarmeVenda::where('tid',$d['tid'])->first();
 
-                $recebimento = !$recebimento == null?$recebimento:new PagarmeRecebimento();
+                $db = !$db == null?$db:new PagarmeVenda();
 
-                $recebimento->idOperacao = $recebimentoAPI['idOperacao'];
-                $recebimento->idTransacao = $recebimentoAPI['idTransacao'];
-                $recebimento->status = $recebimentoAPI['status'];
-                $recebimento->metodoPagamento = $recebimentoAPI['metodoPagamento'];
-                $recebimento->parcela = $recebimentoAPI['parcela'];
-                $recebimento->idTransacao = $recebimentoAPI['idTransacao'];
+                $db->tid = $d['tid'];
+                $db->cliente = $d['cliente'];
+                $db->status = $d['status'];
+                $db->metodoPagamento = $d['metodoPagamento'];
+                $db->parcelas = $d['parcelas'];
 
-                $dataRecebimento = new \DateTime($recebimentoAPI['dataRecebimento']);
-                $dataPagamento = new \DateTime($recebimentoAPI['dataPagamento']);
-                $recebimento->dataRecebimento = $dataRecebimento;
-                $recebimento->dataPagamento = $dataPagamento;
+                $dataPagamento = new \DateTime($d['dataPagamento']);
+                $db->dataPagamento = $dataPagamento;
 
 
-                $recebimento->entrada = $recebimentoAPI['entrada'];
-                $recebimento->saida = $recebimentoAPI['saida'];
-                $recebimento->save();
+                $db->valor = $d['valor'];
+                $db->valorAutorizado = $d['valorAutorizado'];
+                $db->valorPago = $d['valorPago'];
+                $db->save();
             }
 
             $messages->add("Importação concluída! Operações importadas/atualizadas: " . sizeof($data),'success');

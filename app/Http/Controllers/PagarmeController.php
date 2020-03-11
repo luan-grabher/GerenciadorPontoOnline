@@ -79,7 +79,7 @@ class PagarmeController extends Controller
             [
                 'title'=>"Importar Vendas Pagarme",
                 'button_name'=>'Importar',
-                'messages' => PagarmeVenda::getFromAPI($dates['start'],$dates['end'])
+                'messages' => PagarmeVenda::importFromAPI($dates['start'],$dates['end'])
             ]
         );
     }
