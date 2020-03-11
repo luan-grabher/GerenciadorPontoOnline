@@ -5,9 +5,10 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use PagarMe\Client;
 
-class PagarmeRecebimento extends Model
+class PagarmeVenda extends Model
 {
-    public static function getJsonFromAPI(int $start, int $end){
+    public static function getFromAPI(int $start, int $end): array
+    {
         $pagarmeImport = new PagarmeImport(
             "balanceOperations",
             [
@@ -30,7 +31,8 @@ class PagarmeRecebimento extends Model
         return $pagarmeImport->getResults();
     }
 
-    public static function importDataFromAPIToDatabase(int $start, int $end): array {
+    public static function importFromAPI(int $start, int $end): array
+    {
         $messages = new Messages();
 
         try {
@@ -69,5 +71,6 @@ class PagarmeRecebimento extends Model
         }
 
         return $messages->getArray();
+
     }
 }

@@ -51,6 +51,16 @@ Route::group(['prefix' => __('import')], function () {
     Route::group(['prefix' => 'pagarme'], function(){
         Route::get('recebimentos', 'PagarmeController@pageImportRecebimentos')->name('import.pagarme.recebimentos');
         Route::post('recebimentos', 'PagarmeController@pageImportRecebimentosStartImport')->name('import.pagarme.recebimentosStartImport');
+        Route::get('vendas', function(){
+            return view(
+                'layouts.searchWithRange',
+                [
+                    'title'=>'Importar Vendas Pagarme',
+                    'button_name' => "Importar"
+                ]
+            );
+        })->name('import.pagarme.vendas');
+        Route::post('vendas', 'PagarmeController@importVendasFromAPI')->name('import.pagarme.vendas.post');
     });
     Route::group(['prefix' => 'erp'], function(){
         Route::get('vendas', 'ErpController@pageImportVendas')->name('import.erp.vendas');
@@ -70,10 +80,10 @@ Route::group(['prefix' => __('consult')], function () {
 });
 
 Route::group(['prefix' => __('analysis')], function () {
-    Route::group(['prefix' => 'totals'], function(){
+    Route::group(['prefix' => 'balances'], function(){
         Route::group(['prefix'=>'tid'], function(){
-            Route::get('', function(){return view('layouts.searchWithRange',['title'=>'Totais TID']);})->name('analysis.totals.tid');
-            Route::post('', 'AnalysisController@getTotalTid')->name('analysis.totals.tid.get');
+            Route::get('', function(){return view('layouts.searchWithRange',['title'=>'Saldos TID']);})->name('analysis.balances.tid');
+            Route::post('', 'AnalysisController@getTotalTid')->name('analysis.balances.tid.post');
         });
     });
 });

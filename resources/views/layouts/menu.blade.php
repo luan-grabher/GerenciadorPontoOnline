@@ -32,6 +32,10 @@
            class="list-group-item list-group-item-action rounded-0 border-bottom pl-5">
             Pagarme Recebimetnos
         </a>
+        <a href="javascript:$('#iframe-main').attr('src','{{route('import.pagarme.vendas')}}')"
+           class="list-group-item list-group-item-action rounded-0 border-bottom pl-5">
+            Pagarme Vendas
+        </a>
         <a href="javascript:$('#iframe-main').attr('src','{{route('import.erp.vendas')}}')"
            class="list-group-item list-group-item-action rounded-0 border-bottom  pl-5">
             ERP Vendas
@@ -60,9 +64,9 @@
     </a>
     <div id="analysis-options"
          class="collapse">
-        <a href="javascript:$('#iframe-main').attr('src','{{route('analysis.totals.tid')}}')"
+        <a href="javascript:$('#iframe-main').attr('src','{{route('analysis.balances.tid')}}')"
            class="list-group-item list-group-item-action rounded-0 border-bottom pl-5">
-            TID
+            TID - Saldos
         </a>
     </div>
 

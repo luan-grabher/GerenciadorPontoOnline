@@ -6,6 +6,7 @@ use App\Http\Requests\JsonRequest;
 use App\Http\Requests\RangeDateRequest;
 use App\Jobs\ImportPagarmeBalanceoperations;
 use App\pagarmeRecebimento;
+use App\PagarmeVenda;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Queue\Queue;
@@ -69,5 +70,17 @@ class PagarmeController extends Controller
                     'Fim'=>$dates['end'],
                 ]
             ]);
+    }
+
+    public function importVendasFromAPI(RangeDateRequest $request){
+        $dates = $request ->getStartEnd();
+        return view(
+            'layouts.searchWithRange',
+            [
+                'title'=>"Importar Vendas Pagarme",
+                'button_name'=>'Importar',
+                'messages' => PagarmeVenda::getFromAPI($dates['start'],$dates['end'])
+            ]
+        );
     }
 }
