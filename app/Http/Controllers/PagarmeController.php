@@ -43,6 +43,13 @@ class PagarmeController extends Controller
                 date("Y-m-d",strtotime($request->input('fim')))
         ];
         $sales = PagarmeRecebimento::
+        select(['idTransacao as tid','status', 'metodoPagamento as pagamento','parcela'])->
+        selectRaw("
+            date_format(dataRecebimento, '%d/%m/%Y') as recebimento,
+            date_format(dataPagamento, '%d/%m/%Y') as pagamento,
+            concat('R$',FORMAT(entrada/100,2,'de_DE')) as 'entrada',
+            concat('R$',FORMAT(saida/100,2,'de_DE')) as 'saida'
+        ")->
         whereDate(
             'dataRecebimento', ">=", $dates['start'])->
         whereDate(
@@ -64,7 +71,15 @@ class PagarmeController extends Controller
             'end'=>
                 date("Y-m-d",strtotime($request->input('fim')))
         ];
-        $search = PagarmeRecebimento::
+        $search = PagarmeVenda::
+        select(['tid','cliente','status', 'metodoPagamento as pagamento'])->
+        selectRaw("
+            date_format(dataPagamento, '%d/%m/%Y') as pagamento,
+            parcelas,
+            concat('R$',FORMAT(valor/100,2,'de_DE')) as 'valor',
+            concat('R$',FORMAT(valorAutorizado/100,2,'de_DE')) as 'valor autorizado',
+            concat('R$',FORMAT(valorPago/100,2,'de_DE')) as 'valor pago'
+        ")->
         whereDate(
             'dataPagamento', ">=", $dates['start'])->
         whereDate(

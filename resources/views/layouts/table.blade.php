@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table id="table-result" class="table table-dark table-hover">
+    <table id="table-result" class="table table-dark table-hover" style="font-size: 70%">
         @if(isset($data) && sizeof($data) > 0)
             <thead>
                 <tr>
