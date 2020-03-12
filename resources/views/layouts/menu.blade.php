@@ -52,6 +52,10 @@
            class="list-group-item list-group-item-action rounded-0 border-bottom pl-5">
             Pagarme Recebimetnos
         </a>
+        <a href="javascript:$('#iframe-main').attr('src','{{route('consult.pagarme.vendas')}}')"
+           class="list-group-item list-group-item-action rounded-0 border-bottom  pl-5">
+            Pagarme Vendas
+        </a>
         <a href="javascript:$('#iframe-main').attr('src','{{route('consult.erp.vendas')}}')"
            class="list-group-item list-group-item-action rounded-0 border-bottom  pl-5">
             ERP Vendas

@@ -73,4 +73,27 @@ class PagarmeController extends Controller
             ]
         );
     }
+
+    public function viewGetVendas(RangeDateRequest $request){
+        $dates = [
+            'start'=>
+                date("Y-m-d",strtotime($request->input('inicio'))),
+            'end'=>
+                date("Y-m-d",strtotime($request->input('fim')))
+        ];
+        $search = PagarmeRecebimento::
+        whereDate(
+            'dataPagamento', ">=", $dates['start'])->
+        whereDate(
+            'dataPagamento', "<", $dates['end']
+        )->get();
+        return view('layouts.consult',
+            ['title'=>'Pagarme Consultar Vendas',
+                'results' => $search->toArray(),
+                'filters'=>[
+                    'Início'=>$dates['start'],
+                    'Fim'=>$dates['end'],
+                ]
+            ]);
+    }
 }

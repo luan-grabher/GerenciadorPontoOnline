@@ -63,6 +63,15 @@ Route::group(['prefix' => __('consult')], function () {
     Route::group(['prefix' => 'pagarme'], function(){
         Route::get('recebimentos', 'PagarmeController@pageConsultRecebimentos')->name('consult.pagarme.recebimentos');
         Route::post('recebimentos', 'PagarmeController@pageConsultRecebimentosRequest')->name('consult.pagarme.recebimentosRequest');
+        Route::get('vendas', function(){
+            return view(
+                'layouts.searchWithRange',
+                [
+                    'title'=>'Consultar Vendas Pagarme'
+                ]
+            );
+        })->name('consult.pagarme.vendas');
+        Route::post('vendas', 'PagarmeController@viewGetVendas')->name('consult.pagarme.vendas.post');
     });
     Route::group(['prefix' => 'erp'], function(){
         Route::get('vendas', 'ErpController@pageConsultVendas')->name('consult.erp.vendas');
