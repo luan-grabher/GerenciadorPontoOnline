@@ -40,8 +40,10 @@ if (env('APP_DEBUG') == 'true') {
 
 Route::group(['prefix' => __('import')], function () {
     Route::group(['prefix' => 'pagarme'], function(){
-        Route::get('recebimentos', 'PagarmeController@pageImportRecebimentos')->name('import.pagarme.recebimentos');
-        Route::post('recebimentos', 'PagarmeController@pageImportRecebimentosStartImport')->name('import.pagarme.recebimentosStartImport');
+        Route::get('recebimentos',  function(){
+            return view('layouts.import',['title'=>"Importar Pagarme Recebimentos",'button_name' => "Importar"]);
+        })->name('import.pagarme.recebimentos');
+        Route::post('recebimentos', 'PagarmeController@importRecebimentosFromAPI')->name('import.pagarme.recebimentos.post');
         Route::get('vendas', function(){
             return view(
                 'layouts.searchWithRange',
@@ -54,15 +56,19 @@ Route::group(['prefix' => __('import')], function () {
         Route::post('vendas', 'PagarmeController@importVendasFromAPI')->name('import.pagarme.vendas.post');
     });
     Route::group(['prefix' => 'erp'], function(){
-        Route::get('vendas', 'ErpController@pageImportVendas')->name('import.erp.vendas');
-        Route::post('vendas', 'ErpController@pageImportVendasStartImport')->name('import.erp.vendasStartImport');
+        Route::get('vendas', function(){
+            return view('layouts.import',['title'=>"Importar ERP Vendas",'button_name' => "Importar"]);
+        })->name('import.erp.vendas');
+        Route::post('vendas', 'ErpController@importVendasFromERP')->name('import.erp.vendas.post');
     });
 });
 
 Route::group(['prefix' => __('consult')], function () {
     Route::group(['prefix' => 'pagarme'], function(){
-        Route::get('recebimentos', 'PagarmeController@pageConsultRecebimentos')->name('consult.pagarme.recebimentos');
-        Route::post('recebimentos', 'PagarmeController@pageConsultRecebimentosRequest')->name('consult.pagarme.recebimentosRequest');
+        Route::get('recebimentos', function (){
+            return view('layouts.consult',['title'=>"Pagarme Consultar Recebimentos"]);
+        })->name('consult.pagarme.recebimentos');
+        Route::post('recebimentos', 'PagarmeController@viewGetRecebimentos')->name('consult.pagarme.recebimentos.post');
         Route::get('vendas', function(){
             return view(
                 'layouts.searchWithRange',
@@ -74,8 +80,10 @@ Route::group(['prefix' => __('consult')], function () {
         Route::post('vendas', 'PagarmeController@viewGetVendas')->name('consult.pagarme.vendas.post');
     });
     Route::group(['prefix' => 'erp'], function(){
-        Route::get('vendas', 'ErpController@pageConsultVendas')->name('consult.erp.vendas');
-        Route::post('vendas', 'ErpController@pageConsultVendasRequest')->name('consult.erp.vendasRequest');
+        Route::get('vendas', function(){
+            return view('layouts.consult',['title'=>"ERP Consultar Vendas"]);
+        })->name('consult.erp.vendas');
+        Route::post('vendas', 'ErpController@viewGetVendas')->name('consult.erp.vendas.post');
     });
 });
 

@@ -9,12 +9,7 @@ use Illuminate\Http\Request;
 
 class ErpController extends Controller
 {
-    public function pageImportVendas()
-    {
-        return view('layouts.import',['title'=>"Importar ERP Vendas",'button_name' => "Importar"]);
-    }
-
-    public function pageImportVendasStartImport(RangeDateRequest $request)
+    public function importVendasFromERP(RangeDateRequest $request)
     {
         $dates = $request->getStartEnd();
 
@@ -27,13 +22,7 @@ class ErpController extends Controller
             ]
         );
     }
-
-    public function pageConsultVendas()
-    {
-        return view('layouts.consult',['title'=>"ERP Consultar Vendas"]);
-    }
-
-    public function pageConsultVendasRequest(RangeDateRequest $request)
+    public function viewGetVendas(RangeDateRequest $request)
     {
         $dates = [
             'start'=>
