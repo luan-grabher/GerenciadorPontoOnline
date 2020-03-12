@@ -38,15 +38,6 @@ if (env('APP_DEBUG') == 'true') {
     });
 }
 
-Route::group(['prefix'=>'json', 'middleware'=>'auth'], function (){
-    Route::group(['prefix'=>'pagarme'], function(){
-        Route::get("recebimentos/{inicio}/{fim}","PagarmeController@jsonBalanceOperations")->name('json.pagarme.recebimentos');
-    });
-    Route::group(['prefix'=>'erp'],function(){
-        Route::get("vendas/{inicio}/{fim}","ErpController@jsonVendas")->name('json.erp.vendas');
-    });
-});
-
 Route::group(['prefix' => __('import')], function () {
     Route::group(['prefix' => 'pagarme'], function(){
         Route::get('recebimentos', 'PagarmeController@pageImportRecebimentos')->name('import.pagarme.recebimentos');

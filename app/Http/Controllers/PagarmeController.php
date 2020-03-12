@@ -16,16 +16,6 @@ use Symfony\Component\Process\Process;
 
 class PagarmeController extends Controller
 {
-    public function jsonBalanceOperations(JsonRequest $request){
-        try {
-            $datas = $request->getStartEnd();
-
-            return pagarmeRecebimento::getJsonFromAPI($datas['start'],$datas['end']);
-        }catch(\Exception $e){
-            return "";
-        }
-    }
-
     public function pageImportRecebimentos(){
         return view('layouts.import',['title'=>"Importar Pagarme Recebimentos",'button_name' => "Importar"]);
     }

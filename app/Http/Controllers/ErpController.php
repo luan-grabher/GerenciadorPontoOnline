@@ -9,12 +9,6 @@ use Illuminate\Http\Request;
 
 class ErpController extends Controller
 {
-    public function jsonVendas(JsonRequest $request)
-    {
-        $datas = $request->getStartEnd();
-        return ErpVenda::getJsonFromErp($datas['start'], $datas['end']);
-    }
-
     public function pageImportVendas()
     {
         return view('layouts.import',['title'=>"Importar ERP Vendas",'button_name' => "Importar"]);
