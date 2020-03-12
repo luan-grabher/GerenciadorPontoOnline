@@ -74,7 +74,7 @@ class PagarmeController extends Controller
         $search = PagarmeVenda::
         select(['tid','cliente','status', 'metodoPagamento as pagamento'])->
         selectRaw("
-            date_format(dataPagamento, '%d/%m/%Y') as pagamento,
+            date_format(dataPagamento, '%d/%m/%Y') as 'data pagamento',
             parcelas,
             concat('R$',FORMAT(valor/100,2,'de_DE')) as 'valor',
             concat('R$',FORMAT(valorAutorizado/100,2,'de_DE')) as 'valor autorizado',
