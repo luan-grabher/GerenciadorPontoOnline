@@ -23,6 +23,8 @@ class ErpVenda extends Model
 
     public static function getJsonFromErp(int $start, int $end)
     {
+        ini_set ('max_execution_time',  -1);
+
         //Prepare function
         $date_start = date("Y-m-d H:i:s", ($start / 1000));
         $date_end = date("Y-m-d H:i:s", ($end / 1000));
