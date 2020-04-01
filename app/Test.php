@@ -9,11 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class Test extends Model
 {
     public static function test(){
-        return
-            [
-                'date'=> date('d-m-Y')
-            ]
-        ;
+        $import = new ImportERP(new \DateTime("2020-01-30"),new \DateTime("2020-01-31"));
+
+        return $import->import();
     }
 
 }
