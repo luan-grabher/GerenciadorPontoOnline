@@ -14,9 +14,12 @@ class CreateProductTeachersTable extends Migration
     public function up()
     {
         Schema::create('product_teachers', function (Blueprint $table) {
-            $table->bigIncrements('product_id');
+            $table->bigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products');
             $table->string('name',100)->primary();
+
+            $table->primary(['product_id','name']);
+
             $table->float('percent');
             $table->integer('classes');
             $table->timestamps();

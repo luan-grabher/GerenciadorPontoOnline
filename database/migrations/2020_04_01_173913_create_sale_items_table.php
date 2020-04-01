@@ -14,10 +14,12 @@ class CreateSaleItemsTable extends Migration
     public function up()
     {
         Schema::create('sale_items', function (Blueprint $table) {
-            $table->bigIncrements('product_id');
+            $table->bigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products');
-            $table->bigIncrements('sale_id');
-            $table->foreign('sale_id')->references('id')->on('products');
+            $table->bigInteger('sale_id');
+            $table->foreign('sale_id')->references('id')->on('sales');
+
+            $table->primary(['product_id','sale_id']);
 
             $table->string('status',100);
             $table->float('value');
