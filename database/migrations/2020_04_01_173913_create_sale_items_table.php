@@ -24,6 +24,8 @@ class CreateSaleItemsTable extends Migration
             $table->string('status',100);
             $table->float('value');
             $table->float('discount');
+            $table->float('creditUsed');
+            $table->float('creditAdded');
             $table->string('description',100);
 
             $table->timestamps();

@@ -271,6 +271,27 @@ class ImportSalesFromEPR extends Model
         }
         return $items;
     }
+    private function getSaleItemValues(string $colHtml){
+        $values = [
+            'value' => 0,
+            'discount' => 0,
+            'creditAdded' => 0,
+            'creditUsed' => 0
+        ];
+
+        $values = explode(
+            "<br>",
+            str_replace('  ',
+                '',
+                str_replace(
+                    "\r\n", "",
+                    $cols->eq(3)->html()
+                )
+            )
+        );
+
+        return $values;
+    }
 
     private function createProductList()
     {
