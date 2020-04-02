@@ -12,7 +12,7 @@ class Test extends Model
 
         $import = new ImportSalesToDB($start,$end);
 
-        return $import->getImported();
+        return $import->import();
     }
 
 }

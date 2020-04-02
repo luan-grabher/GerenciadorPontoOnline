@@ -40,7 +40,7 @@ class ImportSalesToDB extends Model
         $run = $this->data;
         if(!isset($run['error'])){
             if(!isset(($run = $this->importProducts())['error'])){
-
+                //return $run;
             }
         }
 
