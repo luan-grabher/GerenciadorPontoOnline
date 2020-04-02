@@ -25,8 +25,8 @@ class CreateSalesTable extends Migration
             $table->string('justificationCancellation',300);
             $table->float('creditUsed');
 
-            $table->string('customer');
-            $table->foreign('customer_cpf')->references('cpf');
+            $table->string('customer_cpf',11);
+            $table->foreign('customer_cpf')->references('cpf')->on('customers')->onDelete('cascade');
 
             $table->timestamps();
         });

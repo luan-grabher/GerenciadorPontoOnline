@@ -6,7 +6,7 @@ use Goutte\Client;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\DomCrawler\Crawler;
 
-class ImportERP extends Model
+class ImportSalesFromEPR extends Model
 {
     private array $config = [
         "css" => [
