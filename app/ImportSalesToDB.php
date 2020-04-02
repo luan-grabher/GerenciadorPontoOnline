@@ -52,20 +52,20 @@ class ImportSalesToDB extends Model
             if(isset($this->data['products'])){
                 $products = $this->data['products'];
                 foreach ($products as $productERP){
-                    $product = Product::where($productERP['code'])->first();
+                    $product = Product::where('id',$productERP['code'])->first();
                     $product = ! $product == null? $product : new Product();
 
                     $product->id = $productERP['code'];
                     $product->name = $productERP['name'];
                     $product->value = $productERP['value'];
-                    $product->dateStart = $productERP['dateStart'];
-                    $product->dateEnd = $productERP['dateEnd'];
+                    $product->dateStart = \DateTime::createFromFormat('d/m/Y H:i:s',$productERP['dateStart'])->format('Y-m-d');
+                    $product->dateEnd = \DateTime::createFromFormat('d/m/Y H:i:s',$productERP['dateEnd'])->format('Y-m-d');
                     $product->status = $productERP['status'];
                     $product->type = $productERP['type'];
-                    $product->dateUnavailability = $productERP['dateUnavailability'];
+                    $product->dateUnavailability = \DateTime::createFromFormat('d/m/Y H:i:s',$productERP['dateUnavailability'])->format('Y-m-d');
 
                     $product->save();
-                    $this->imported['products'][$product['code']] = $product['code'];
+                    $this->imported['products'][$productERP['code']] = $productERP['code'];
                 }
             }else{
                 throw new \Exception("Products is not set in importation of ERP.");
@@ -78,5 +78,13 @@ class ImportSalesToDB extends Model
             ];
         }
     }
+    public function importProductTeachers(int $product, array  $teachers){
+        try {
 
+        }catch(\Exception $e){
+            return [
+                'error'
+            ];
+        }
+    }
 }
