@@ -93,7 +93,7 @@ class ImportSalesFromEPR extends Model
                     if (!isset(($run = $this->createProductList())['error'])) {
                         if (!isset(($run = $this->getInfoProducts())['error'])) {
                             $run = [
-                                'sales'=>  $this->sales,
+                                'sales' => $this->sales,
                                 'products' => $this->products,
                                 'customers' => $this->customers
                             ];
@@ -214,7 +214,8 @@ class ImportSalesFromEPR extends Model
         }
     }
 
-    private function getSaleCustomer(Crawler $response, int $sale){
+    private function getSaleCustomer(Crawler $response, int $sale)
+    {
         $customer = [];
         $customer['cpf'] = $response->filter($this->config['css']['sale']['customer']['cpf'])->text();
         $customer['name'] = $response->filter($this->config['css']['sale']['customer']['name'])->text();
@@ -223,13 +224,13 @@ class ImportSalesFromEPR extends Model
         $customer['sale'] = $sale;
 
         //If not exists this customer in this import or is most new
-        if(
+        if (
             !isset($this->customers[$customer['cpf']]) ||
             (
                 isset($this->customers[$customer['cpf']]) &&
                 $this->customers[$customer['cpf']]['sale'] < $customer['sale']
             )
-        ){
+        ) {
             $this->customers[$customer['cpf']]['cpf'] = $customer['cpf'];
             $this->customers[$customer['cpf']]['name'] = $customer['name'];
             $this->customers[$customer['cpf']]['birthday'] = $customer['birthday'];
@@ -248,49 +249,55 @@ class ImportSalesFromEPR extends Model
 
             $cols = $item->filter($this->config['css']['sale']['items']['cols']);
             if ($cols->count() && is_numeric($cols->first()->text())) {
-                $colValue = explode(
-                    "<br>",
-                    str_replace('  ',
-                        '',
-                        str_replace(
-                            "\r\n", "",
-                            $cols->eq(3)->html()
-                        )
-                    )
-                );
+                $values = $this->getSaleItemValues( $cols->eq(3)->html());
 
                 $items[] = [
                     'product' => (int)$cols->eq(0)->text(),
                     'status' => $cols->eq(2)->text(),
-                    'value' => (float)(isset($colValue[0]) ? ((int)filter_var($colValue[0], FILTER_SANITIZE_NUMBER_FLOAT)) / 100 : 0),
-                    'discount' => (float)(isset($colValue[1]) ? ((int)filter_var($colValue[1], FILTER_SANITIZE_NUMBER_FLOAT)) / 100 : 0),
-                    'description' => isset($colValue[2]) ? $colValue[2] : '',
-                    'valueElement' => $colValue
+                    'value' => $values['value'],
+                    'discount' => $values['discount'],
+                    'creditAdded' => $values['creditAdded'],
+                    'creditUsed' => $values['creditUsed'],
+                    'description' => $values['description'],
+                    'valueElement' => $values
                 ];
             }
         }
         return $items;
     }
-    private function getSaleItemValues(string $colHtml){
+
+    private function getSaleItemValues(string $colHtml)
+    {
         $values = [
             'value' => 0,
             'discount' => 0,
             'creditAdded' => 0,
-            'creditUsed' => 0
+            'creditUsed' => 0,
+            'description' => ''
         ];
 
-        $values = explode(
-            "<br>",
-            str_replace('  ',
-                '',
-                str_replace(
-                    "\r\n", "",
-                    $cols->eq(3)->html()
-                )
-            )
-        );
+        $valuesHtml = explode("<br>", str_replace('  ', '', str_replace("\r\n", "", $colHtml)));
+
+        $values['value'] = $this->getValueFromMoney($valuesHtml[0]);
+        if(sizeof($valuesHtml) > 1){
+            foreach ($valuesHtml as $val){
+                if(strpos($val,'creditado')){
+                    $values['creditAdded'] = $this->getValueFromMoney($val);
+                }elseif(strpos($val,'credito')){
+                    $values['creditUsed'] = $this->getValueFromMoney($val);
+                }elseif(strpos($val,'desconto')){
+                    $values['discount'] = $this->getValueFromMoney($val);
+                }elseif($val != $valuesHtml[0]){
+                    $values['description'] .= ($values['description']==''?'':' ') . $val;
+                }
+            }
+        }
 
         return $values;
+    }
+
+    private function getValueFromMoney(string $money): float{
+        return (float)($money != null ? ((int)filter_var($money, FILTER_SANITIZE_NUMBER_FLOAT)) / 100 : 0);
     }
 
     private function createProductList()
@@ -353,8 +360,8 @@ class ImportSalesFromEPR extends Model
             if ($cols->count() > 0) {
                 $teachers[] = [
                     'name' => $cols->eq(0)->text(),
-                    'percent' => (float) $cols->eq(1)->text(),
-                    'classes' => (float) $cols->eq(2)->text()
+                    'percent' => (float)$cols->eq(1)->text(),
+                    'classes' => (float)$cols->eq(2)->text()
                 ];
             }
         }

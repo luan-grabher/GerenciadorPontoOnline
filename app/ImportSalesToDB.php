@@ -130,6 +130,8 @@ class ImportSalesToDB extends Model
                 $saleItem->status = $item['status'];
                 $saleItem->value = $item['value'];
                 $saleItem->discount = $item['discount'];
+                $saleItem->creditUsed = $item['creditUsed'];
+                $saleItem->creditAdded = $item['creditAdded'];
                 $saleItem->description = $item['description'];
                 $saleItem->save();
 
