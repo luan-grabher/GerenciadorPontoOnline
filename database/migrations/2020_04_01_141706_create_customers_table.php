@@ -18,6 +18,7 @@ class CreateCustomersTable extends Migration
             $table->string('name',200);
             $table->date('birthday');
             $table->string('email',150);
+            $table->bigInteger('lastSale');
             $table->timestamps();
         });
     }

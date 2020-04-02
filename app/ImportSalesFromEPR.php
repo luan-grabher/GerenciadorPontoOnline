@@ -33,7 +33,7 @@ class ImportSalesFromEPR extends Model
                 'customer' => [
                     'cpf' => 'div#DadosCliente tr:nth-child(2) > td:nth-child(2)',
                     'name' => 'div#DadosCliente tr:nth-child(1) > td:nth-child(2)',
-                    'birthDate' => 'div#DadosCliente tr:nth-child(3) > td:nth-child(2)',
+                    'birthDay' => 'div#DadosCliente tr:nth-child(3) > td:nth-child(2)',
                     'email' => 'div#DadosCliente tr:nth-child(4) > td:nth-child(2)'
                 ],
                 'items' => [
@@ -67,6 +67,7 @@ class ImportSalesFromEPR extends Model
 
     private array $sales = [];
     private array $products = [];
+    private array $customers = [];
 
     /**
      * ImportERP constructor.
@@ -93,7 +94,8 @@ class ImportSalesFromEPR extends Model
                         if (!isset(($run = $this->getInfoProducts())['error'])) {
                             $run = [
                                 'sales'=>  $this->sales,
-                                'products' => $this->products
+                                'products' => $this->products,
+                                'customers' => $this->customers
                             ];
                         }
                     }
@@ -198,10 +200,7 @@ class ImportSalesFromEPR extends Model
                 $sale['justificationCancellation'] = $response->filter($this->config['css']['sale']['justificationCancellation'])->attr('value');
                 $sale['creditUsed'] = $response->filter($this->config['css']['sale']['creditUsed'])->text();
 
-                $sale['customer']['cpf'] = $response->filter($this->config['css']['sale']['customer']['cpf'])->text();
-                $sale['customer']['name'] = $response->filter($this->config['css']['sale']['customer']['name'])->text();
-                $sale['customer']['birthDate'] = $response->filter($this->config['css']['sale']['customer']['birthDate'])->text();
-                $sale['customer']['email'] = $response->filter($this->config['css']['sale']['customer']['email'])->text();
+                $sale['customer'] = $this->getSaleCustomer($response, $sale['saleNumber']);
 
                 $sale['items'] = $this->getSalesItems($response->filter($this->config['css']['sale']['items']['rows']));
             }
@@ -213,6 +212,32 @@ class ImportSalesFromEPR extends Model
                 "error" => "getInfoSales: " . $e->getMessage()
             ];
         }
+    }
+
+    private function getSaleCustomer(Crawler $response, int $sale){
+        $customer = [];
+        $customer['cpf'] = $response->filter($this->config['css']['sale']['customer']['cpf'])->text();
+        $customer['name'] = $response->filter($this->config['css']['sale']['customer']['name'])->text();
+        $customer['birthday'] = $response->filter($this->config['css']['sale']['customer']['birthDay'])->text();
+        $customer['email'] = $response->filter($this->config['css']['sale']['customer']['email'])->text();
+        $customer['sale'] = $sale;
+
+        //If not exists this customer in this import or is most new
+        if(
+            !isset($this->customers[$customer['cpf']]) ||
+            (
+                isset($this->customers[$customer['cpf']]) &&
+                $this->customers[$customer['cpf']]['sale'] < $customer['sale']
+            )
+        ){
+            $this->customers[$customer['cpf']]['cpf'] = $customer['cpf'];
+            $this->customers[$customer['cpf']]['name'] = $customer['name'];
+            $this->customers[$customer['cpf']]['birthday'] = $customer['birthday'];
+            $this->customers[$customer['cpf']]['email'] = $customer['email'];
+            $this->customers[$customer['cpf']]['sale'] = $customer['sale'];
+        }
+
+        return $customer;
     }
 
     private function getSalesItems(Crawler $rows)

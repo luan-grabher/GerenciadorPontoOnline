@@ -40,11 +40,27 @@ class ImportSalesToDB extends Model
         $run = $this->data;
         if(!isset($run['error'])){
             if(!isset(($run = $this->importProducts())['error'])){
-                //return $run;
+                if(!isset(($run = $this->importSales())['error'])){
+
+                }
             }
         }
 
         return $run;
+    }
+
+    public function importSales(){
+        try {
+            if(isset($this->data['sales'])){
+                $sales = $this->data['sales'];
+
+            }else{
+                throw new \Exception('Sales is not set from Import ERP');
+            }
+            return $this->imported;
+        }catch (\Exception $e){
+            return ArrayError::error('Import Sales to DB',$e);
+        }
     }
 
     public function importProducts():array{
@@ -65,7 +81,11 @@ class ImportSalesToDB extends Model
                     $product->dateUnavailability = \DateTime::createFromFormat('d/m/Y H:i:s',$productERP['dateUnavailability'])->format('Y-m-d');
 
                     $product->save();
-                    $this->imported['products'][$productERP['code']] = $productERP['code'];
+                    $this->imported['products'][$productERP['code']]['code'] = $productERP['code'];
+
+                    //Teachers
+                    $this->imported['products'][$productERP['code']]['teachers'] =
+                        $this->importProductTeachers($productERP['code'],$productERP['teachers']);
                 }
             }else{
                 throw new \Exception("Products is not set in importation of ERP.");
@@ -78,7 +98,26 @@ class ImportSalesToDB extends Model
     }
     public function importProductTeachers(int $product, array  $teachers){
         try {
+            $importedTeachers = [];
 
+            foreach ($teachers as $teacherERP){
+                $teacher = ProductTeacher::where([
+                    ['product_id',$product],
+                    ['name',$teacherERP['name']]
+                ])->first();
+                $teacher = !is_null($teacher)?$teacher:new ProductTeacher();
+
+                $teacher->product_id = $product;
+                $teacher->name = $teacherERP['name'];
+                $teacher->percent = $teacherERP['percent'];
+                $teacher->classes = $teacherERP['classes'];
+
+                $teacher->save();
+
+                $importedTeachers[] = $teacherERP['name'];
+            }
+
+            return $importedTeachers;
         }catch(\Exception $e){
             return ArrayError::error('Import Product Teachers to DB',$e);
         }
