@@ -73,18 +73,14 @@ class ImportSalesToDB extends Model
 
             return $this->imported;
         }catch(\Exception $e){
-            return [
-                'error' =>  "Import Products to DB: " . $e->getMessage()
-            ];
+            return ArrayError::error('Import Product to DB', $e);
         }
     }
     public function importProductTeachers(int $product, array  $teachers){
         try {
 
         }catch(\Exception $e){
-            return [
-                'error'
-            ];
+            return ArrayError::error('Import Product Teachers to DB',$e);
         }
     }
 }
