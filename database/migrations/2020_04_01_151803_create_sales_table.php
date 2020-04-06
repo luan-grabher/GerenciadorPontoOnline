@@ -22,7 +22,7 @@ class CreateSalesTable extends Migration
             $table->string('paymentMethod',100);
             $table->integer('installments');
             $table->boolean('canceled');
-            $table->string('justificationCancellation',300);
+            $table->text('justificationCancellation');
             $table->float('creditUsed');
 
             $table->string('customer_cpf',11);

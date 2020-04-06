@@ -26,6 +26,7 @@ class CreateSaleItemsTable extends Migration
             $table->float('discount');
             $table->float('creditUsed');
             $table->float('creditAdded');
+            $table->float('reversed');
             $table->string('description',100);
 
             $table->timestamps();

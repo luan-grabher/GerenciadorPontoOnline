@@ -132,6 +132,7 @@ class ImportSalesToDB extends Model
                 $saleItem->discount = $item['discount'];
                 $saleItem->creditUsed = $item['creditUsed'];
                 $saleItem->creditAdded = $item['creditAdded'];
+                $saleItem->reversed = $item['reversed'];
                 $saleItem->description = $item['description'];
                 $saleItem->save();
 
@@ -140,7 +141,7 @@ class ImportSalesToDB extends Model
 
             return $imported;
         }catch(\Exception $e){
-            return ArrayError::error('Import Sale Items to DB',$e);
+            return ArrayError::string('Import Sale Items to DB',$e->getMessage(). " - " . $e->getTraceAsString());
         }
     }
 

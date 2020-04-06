@@ -258,6 +258,7 @@ class ImportSalesFromEPR extends Model
                     'discount' => $values['discount'],
                     'creditAdded' => $values['creditAdded'],
                     'creditUsed' => $values['creditUsed'],
+                    'reversed' => $values['reversed'],
                     'description' => $values['description'],
                     'valueElement' => $values
                 ];
@@ -273,7 +274,8 @@ class ImportSalesFromEPR extends Model
             'discount' => 0,
             'creditAdded' => 0,
             'creditUsed' => 0,
-            'description' => ''
+            'reversed'  => 0,
+            'description' => '',
         ];
 
         $valuesHtml = explode("<br>", str_replace('  ', '', str_replace("\r\n", "", $colHtml)));
@@ -287,6 +289,8 @@ class ImportSalesFromEPR extends Model
                     $values['creditUsed'] = $this->getValueFromMoney($val);
                 }elseif(strpos($val,'desconto')){
                     $values['discount'] = $this->getValueFromMoney($val);
+                }elseif(strpos($val,'estornado')){
+                    $values['reversed'] = $this->getValueFromMoney($val);
                 }elseif($val != $valuesHtml[0]){
                     $values['description'] .= ($values['description']==''?'':' ') . $val;
                 }
