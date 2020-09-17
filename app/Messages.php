@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Messages extends Model
 {
-    private $messages = [];
+    private array $messages = [];
 
     public function add(string $message,string $type = 'info'){
         $this->messages[] = ['type' =>$type,'text' => $message];

@@ -2,22 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\ErpVenda;
 use App\Http\Requests\RangeDateRequest;
-use Illuminate\Support\Facades\DB;
+use App\ImportSalesFromEPR;
+use App\Messages;
+use App\Sale;
 
 class ErpController extends Controller
 {
     public function importVendasFromERP(RangeDateRequest $request)
     {
+        $messages = new Messages();
+
         $dates = $request->getStartEnd();
+
+        $start = new \DateTime(date("Y-m-d",$dates['start']));
+        $end = new \DateTime(date("Y-m-d",$dates['end']));
+
+        $importation = new ImportSalesFromEPR($start, $end);
+        $resultImportation = $importation->import();
+        if(isset($resultImportation['error'])){
+            $messages->add($resultImportation['error'],"danger");
+        }elseif(isset($resultImportation['sales']) && is_array($resultImportation['sales'])){
+            $messages->add("Foram importadas " . sizeof($resultImportation['sales']). " vendas do sistema.", "success");
+        }else{
+            $messages->add("O programa não retornou nenhuma venda importada e nenhum erro!");
+        }
 
         return view(
             'layouts.import',
             [
                 'title'=>"Importar ERP Vendas",
                 'button_name' => "Importar",
-                'messages' => ErpVenda::importDataFromERPToDatabase($dates['start'], $dates['end'])
+                'messages' => $messages->getArray()
             ]
         );
     }
@@ -29,7 +45,7 @@ class ErpController extends Controller
             'end'=>
                 date("Y-m-d",strtotime($request->input('fim')))
         ];
-        $sales = ErpVenda::
+        $sales = Sale::
         select(['matricula','tid','curso_id','curso','aluno'])->
         selectRaw("
             date_format(dataRecebimento, '%d/%m/%Y') as recebimento,

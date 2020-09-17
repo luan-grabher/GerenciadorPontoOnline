@@ -134,7 +134,7 @@ class ImportSalesFromEPR extends Model
             return [];
         } catch (\Exception $e) {
             return [
-                "error" => $e->getMessage()
+                "error" => "Erro ao fazer login: " . $e->getTraceAsString()
             ];
         }
     }
@@ -173,7 +173,7 @@ class ImportSalesFromEPR extends Model
             return $this->sales;
         } catch (\Exception $e) {
             return [
-                "error" => "getSalesNumber: " . $e->getMessage()
+                "error" => "Erro ao encontrar vendas: " . $e->getMessage()
             ];
         }
     }
@@ -209,7 +209,7 @@ class ImportSalesFromEPR extends Model
             return $this->sales;
         } catch (\Exception $e) {
             return [
-                "error" => "getInfoSales: " . $e->getMessage()
+                "error" => "Erro ao pegar informações das vendas: " . $e->getMessage()
             ];
         }
     }
@@ -321,7 +321,7 @@ class ImportSalesFromEPR extends Model
             return $this->products;
         } catch (\Exception $e) {
             return [
-                'error' => "createProductlist: " . $e->getMessage()
+                'error' => "Erro ao criar lista de cursos das vendas: " . $e->getMessage()
             ];
         }
     }
@@ -349,7 +349,7 @@ class ImportSalesFromEPR extends Model
             return $this->products;
         } catch (\Exception $e) {
             return [
-                'error' => 'getProducts(' . $e->getLine() . '): ' . $e->getMessage() . $e->getTraceAsString()
+                'error' => 'Erro ao pegar informações dos cursos(' . $e->getLine() . '): ' . $e->getMessage() . $e->getTraceAsString()
             ];
         }
     }
