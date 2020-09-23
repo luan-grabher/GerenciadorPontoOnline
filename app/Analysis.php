@@ -10,7 +10,10 @@ class Analysis extends Model
     public static function getTidBalance(string $start, string $end){
         $results = [];
 
-        //Get sales
+        /**
+         * Pega vendas do pagarme com tid, cliente e metodo de pagamento
+         * Pega a data da venda, o número de parcelas e o valor da venda
+         */
         $sales =
             PagarmeVenda::
             select(['tid','cliente','metodoPagamento as pagamento'])

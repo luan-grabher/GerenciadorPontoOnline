@@ -20,12 +20,17 @@ class ErpController extends Controller
 
         $importation = new ImportSalesFromEPR($start, $end);
         $resultImportation = $importation->import();
+        //Se Tiver um erro
         if(isset($resultImportation['error'])){
             $messages->add($resultImportation['error'],"danger");
+
+            //Se tiver vendas
         }elseif(isset($resultImportation['sales']) && is_array($resultImportation['sales'])){
             $messages->add("Foram importadas " . sizeof($resultImportation['sales']). " vendas do sistema.", "success");
+
+            //Se nao tiver erro nem vendas
         }else{
-            $messages->add("O programa não retornou nenhuma venda importada e nenhum erro!");
+            $messages->add("O programa não retornou nenhuma venda importada ou erro!");
         }
 
         return view(

@@ -169,7 +169,6 @@ class ImportSalesFromEPR extends Model
                 $next = (bool)$response->filter($this->config['css']['sales']['table']['nextPage'])->count();
             }
 
-
             return $this->sales;
         } catch (\Exception $e) {
             return [
