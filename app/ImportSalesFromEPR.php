@@ -125,16 +125,25 @@ class ImportSalesFromEPR extends Model
     private function makeLogin()
     {
         try {
-            $crawler = $this->client->request('GET', env("ERP_URL_HOME"));
+
+            $crawler = $this->client->request('GET', env("ERP_URL_LOGIN"));
+
+            $error = "Fez o request!";
+
             $form = $crawler->selectButton($this->config['css']['login']['btn'])->form();
             $form['UserName'] = env("ERP_USER");
             $form['Password'] = env("ERP_PASSWORD");
             $crawler = $this->client->submit($form);
 
-            return [];
+            /*Se a url que for depois do submit for a principal, fez login, se for igual a url de login, não fez o login*/
+            if($crawler->getUri() == env("ERP_URL_HOME") . "/"){
+                return [];
+            }else{
+                throw new \Exception("Não foi possivel realizar o login com o usuário e senha fornecidos nas configurações!");
+            }
         } catch (\Exception $e) {
             return [
-                "error" => "Erro ao fazer login: " . $e->getTraceAsString()
+                "error" => "Erro ao fazer login: (" . $e->getCode() . ")" . $e->getMessage()
             ];
         }
     }
@@ -169,6 +178,10 @@ class ImportSalesFromEPR extends Model
                 $next = (bool)$response->filter($this->config['css']['sales']['table']['nextPage'])->count();
             }
 
+
+            return [
+                "error" => "Encontrei " . sizeof($this->sales) . " vendas para buscar as informações!"
+            ];
             return $this->sales;
         } catch (\Exception $e) {
             return [
