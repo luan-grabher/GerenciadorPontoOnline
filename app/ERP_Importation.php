@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Exception;
 use Goutte\Client;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\DomCrawler\Crawler;
@@ -143,9 +144,9 @@ class ERP_Importation extends Model
             if($crawler->getUri() == env("ERP_URL_HOME") . "/"){
                 return [];
             }else{
-                throw new \Exception("Não foi possivel realizar o login com o usuário e senha fornecidos nas configurações!");
+                throw new Exception("Não foi possivel realizar o login com o usuário e senha fornecidos nas configurações!");
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 "error" => "Erro ao fazer login: (" . $e->getCode() . ")" . $e->getMessage()
             ];
@@ -183,7 +184,7 @@ class ERP_Importation extends Model
             }
 
             return $this->sales;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 "error" => "Erro ao encontrar vendas: " . $e->getMessage()
             ];
@@ -219,7 +220,7 @@ class ERP_Importation extends Model
 
 
             return $this->sales;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 "error" => "Erro ao pegar informações das vendas: " . $e->getMessage()
             ];
@@ -331,7 +332,7 @@ class ERP_Importation extends Model
             }
 
             return $this->products;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'error' => "Erro ao criar lista de cursos das vendas: " . $e->getMessage()
             ];
@@ -359,7 +360,7 @@ class ERP_Importation extends Model
             }
 
             return $this->products;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'error' => 'Erro ao pegar informações dos cursos(' . $e->getLine() . '): ' . $e->getMessage() . $e->getTraceAsString()
             ];
@@ -408,10 +409,10 @@ class ERP_Importation extends Model
                     }
                 }
             }else{
-                throw new \Exception('Customers is not set from Import ERP');
+                throw new Exception('Customers is not set from Import ERP');
             }
             return $this->imported;
-        }catch (\Exception $e){
+        }catch (Exception $e){
             return ArrayError::error('Import Customers to DB',$e);
         }
     }
@@ -443,10 +444,10 @@ class ERP_Importation extends Model
                     ];
                 }
             }else{
-                throw new \Exception('Sales is not set from Import ERP');
+                throw new Exception('Sales is not set from Import ERP');
             }
             return $this->imported;
-        }catch (\Exception $e){
+        }catch (Exception $e){
             return ArrayError::error('Import Sales to DB',$e);
         }
     }
@@ -474,7 +475,7 @@ class ERP_Importation extends Model
             }
 
             return $imported;
-        }catch(\Exception $e){
+        }catch(Exception $e){
             return ArrayError::string('Import Sale Items to DB',$e->getMessage(). " - " . $e->getTraceAsString());
         }
     }
@@ -503,11 +504,11 @@ class ERP_Importation extends Model
                         $this->importProductTeachers($productERP['code'],$productERP['teachers']);
                 }
             }else{
-                throw new \Exception("Products is not set in importation of ERP.");
+                throw new Exception("Products is not set in importation of ERP.");
             }
 
             return $this->imported;
-        }catch(\Exception $e){
+        }catch(Exception $e){
             return ArrayError::error('Import Product to DB', $e);
         }
     }
@@ -533,7 +534,7 @@ class ERP_Importation extends Model
             }
 
             return $importedTeachers;
-        }catch(\Exception $e){
+        }catch(Exception $e){
             return ArrayError::error('Import Product Teachers to DB',$e);
         }
     }
