@@ -22,7 +22,7 @@ class ImportSalesToDB extends Model
         $this->dateStart = $dateStart;
         $this->dateEnd = $dateEnd;
 
-        $ERPImport = new ImportSalesFromEPR($this->dateStart,$this->dateEnd);
+        $ERPImport = new ERP_Importation($this->dateStart,$this->dateEnd);
 
         $this->data = $ERPImport->import();
     }

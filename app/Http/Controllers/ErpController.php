@@ -3,22 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RangeDateRequest;
-use App\ImportSalesFromEPR;
+use App\ERP_Importation;
 use App\Messages;
 use App\Sale;
 
 class ErpController extends Controller
 {
-    public function importVendasFromERP(RangeDateRequest $request)
+    public function importERPSalesInRangeDate(RangeDateRequest $request)
     {
+        /*Instancia as mensagens*/
         $messages = new Messages();
 
+        /*Define datas*/
         $dates = $request->getStartEnd();
+        $start = new \DateTime();
+        $end = new \DateTime();
+        $start->setTimestamp($dates['start']/1000);
+        $end->setTimestamp($dates['end']/1000);
 
-        $start = new \DateTime(date("Y-m-d",$dates['start']));
-        $end = new \DateTime(date("Y-m-d",$dates['end']));
-
-        $importation = new ImportSalesFromEPR($start, $end);
+        $importation = new ERP_Importation($start, $end);
         $resultImportation = $importation->import();
         //Se Tiver um erro
         if(isset($resultImportation['error'])){

@@ -6,7 +6,7 @@ use Goutte\Client;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\DomCrawler\Crawler;
 
-class ImportSalesFromEPR extends Model
+class ERP_Importation extends Model
 {
     private array $config = [
         "css" => [
@@ -78,20 +78,24 @@ class ImportSalesFromEPR extends Model
     {
         $this->dateStart = $dateStart;
         $this->dateEnd = $dateEnd;
-
-        $this->client = new Client();
     }
 
     public function import(): array
     {
         ini_set('max_execution_time', -1);
+        $this->client = new Client();
 
         $run = [];
-        if (!isset(($run = $this->makeLogin())['error'])) {
-            if (!isset(($run = $this->getSalesNumber())['error'])) {
-                if (!isset(($run = $this->getInfoSales())['error'])) {
-                    if (!isset(($run = $this->createProductList())['error'])) {
-                        if (!isset(($run = $this->getInfoProducts())['error'])) {
+        /*Faz Login*/
+        if (!isset(($run = $this->erp_makeLogin())['error'])) {
+            /*Pega o id de todas as vendas do periodo*/
+            if (!isset(($run = $this->erp_getSalesNumber())['error'])) {
+                /*Pega as informações das vendas uma a uma*/
+                if (!isset(($run = $this->erp_getInfoSales())['error'])) {
+                    /*Cria lista de produtos usando as vendas*/
+                    if (!isset(($run = $this->erp_createProductList())['error'])) {
+                        /*Pega as informações dos produtos da lista*/
+                        if (!isset(($run = $this->erp_getInfoProducts())['error'])) {
                             $run = [
                                 'sales' => $this->sales,
                                 'products' => $this->products,
@@ -106,23 +110,7 @@ class ImportSalesFromEPR extends Model
         return $run;
     }
 
-    /**
-     * @return array
-     */
-    public function getSales(): array
-    {
-        return $this->sales;
-    }
-
-    /**
-     * @return array
-     */
-    public function getProducts(): array
-    {
-        return $this->products;
-    }
-
-    private function makeLogin()
+    private function erp_makeLogin()
     {
         try {
 
@@ -148,7 +136,7 @@ class ImportSalesFromEPR extends Model
         }
     }
 
-    private function getSalesNumber()
+    private function erp_getSalesNumber()
     {
         try {
             $page = (int)0;
@@ -178,10 +166,6 @@ class ImportSalesFromEPR extends Model
                 $next = (bool)$response->filter($this->config['css']['sales']['table']['nextPage'])->count();
             }
 
-
-            return [
-                "error" => "Encontrei " . sizeof($this->sales) . " vendas para buscar as informações!"
-            ];
             return $this->sales;
         } catch (\Exception $e) {
             return [
@@ -190,7 +174,7 @@ class ImportSalesFromEPR extends Model
         }
     }
 
-    private function getInfoSales()
+    private function erp_getInfoSales()
     {
         try {
             foreach ($this->sales as &$sale) {
@@ -212,9 +196,9 @@ class ImportSalesFromEPR extends Model
                 $sale['justificationCancellation'] = $response->filter($this->config['css']['sale']['justificationCancellation'])->attr('value');
                 $sale['creditUsed'] = $response->filter($this->config['css']['sale']['creditUsed'])->text();
 
-                $sale['customer'] = $this->getSaleCustomer($response, $sale['saleNumber']);
+                $sale['customer'] = $this->erp_getSaleCustomer($response, $sale['saleNumber']);
 
-                $sale['items'] = $this->getSalesItems($response->filter($this->config['css']['sale']['items']['rows']));
+                $sale['items'] = $this->erp_getSalesItems($response->filter($this->config['css']['sale']['items']['rows']));
             }
 
 
@@ -226,7 +210,7 @@ class ImportSalesFromEPR extends Model
         }
     }
 
-    private function getSaleCustomer(Crawler $response, int $sale)
+    private function erp_getSaleCustomer(Crawler $response, int $sale)
     {
         $customer = [];
         $customer['cpf'] = $response->filter($this->config['css']['sale']['customer']['cpf'])->text();
@@ -253,7 +237,7 @@ class ImportSalesFromEPR extends Model
         return $customer;
     }
 
-    private function getSalesItems(Crawler $rows)
+    private function erp_getSalesItems(Crawler $rows)
     {
         $items = [];
         foreach ($rows as $item) {
@@ -261,7 +245,7 @@ class ImportSalesFromEPR extends Model
 
             $cols = $item->filter($this->config['css']['sale']['items']['cols']);
             if ($cols->count() && is_numeric($cols->first()->text())) {
-                $values = $this->getSaleItemValues( $cols->eq(3)->html());
+                $values = $this->erp_getSaleItemValues( $cols->eq(3)->html());
 
                 $items[] = [
                     'product' => (int)$cols->eq(0)->text(),
@@ -279,7 +263,7 @@ class ImportSalesFromEPR extends Model
         return $items;
     }
 
-    private function getSaleItemValues(string $colHtml)
+    private function erp_getSaleItemValues(string $colHtml)
     {
         $values = [
             'value' => 0,
@@ -292,17 +276,17 @@ class ImportSalesFromEPR extends Model
 
         $valuesHtml = explode("<br>", str_replace('  ', '', str_replace("\r\n", "", $colHtml)));
 
-        $values['value'] = $this->getValueFromMoney($valuesHtml[0]);
+        $values['value'] = $this->erp_getValueFromMoney($valuesHtml[0]);
         if(sizeof($valuesHtml) > 1){
             foreach ($valuesHtml as $val){
                 if(strpos($val,'creditado')){
-                    $values['creditAdded'] = $this->getValueFromMoney($val);
+                    $values['creditAdded'] = $this->erp_getValueFromMoney($val);
                 }elseif(strpos($val,'credito')){
-                    $values['creditUsed'] = $this->getValueFromMoney($val);
+                    $values['creditUsed'] = $this->erp_getValueFromMoney($val);
                 }elseif(strpos($val,'desconto')){
-                    $values['discount'] = $this->getValueFromMoney($val);
+                    $values['discount'] = $this->erp_getValueFromMoney($val);
                 }elseif(strpos($val,'estornado')){
-                    $values['reversed'] = $this->getValueFromMoney($val);
+                    $values['reversed'] = $this->erp_getValueFromMoney($val);
                 }elseif($val != $valuesHtml[0]){
                     $values['description'] .= ($values['description']==''?'':' ') . $val;
                 }
@@ -312,11 +296,11 @@ class ImportSalesFromEPR extends Model
         return $values;
     }
 
-    private function getValueFromMoney(string $money): float{
+    private function erp_getValueFromMoney(string $money): float{
         return (float)($money != null ? ((int)filter_var($money, FILTER_SANITIZE_NUMBER_FLOAT)) / 100 : 0);
     }
 
-    private function createProductList()
+    private function erp_createProductList()
     {
         try {
             foreach ($this->sales as $sale) {
@@ -338,7 +322,7 @@ class ImportSalesFromEPR extends Model
         }
     }
 
-    private function getInfoProducts()
+    private function erp_getInfoProducts() : array
     {
         try {
             foreach ($this->products as &$product) {
@@ -355,7 +339,7 @@ class ImportSalesFromEPR extends Model
                 $product['type'] = $response->filter($this->config['css']['product']['type'])->filter($this->config['css']['product']['selectValue'])->text();
                 $product['dateUnavailability'] = $response->filter($this->config['css']['product']['dateUnavailability'])->attr('value');
 
-                $product['teachers'] = $this->getProductTeachers($response->filter($this->config['css']['product']['teachers']));
+                $product['teachers'] = $this->erp_getProductTeachers($response->filter($this->config['css']['product']['teachers']));
             }
 
             return $this->products;
@@ -366,7 +350,10 @@ class ImportSalesFromEPR extends Model
         }
     }
 
-    private function getProductTeachers(Crawler $rows)
+    /**
+     * @return array Lista de Professores dos cursos
+     */
+    private function erp_getProductTeachers(Crawler $rows) : array
     {
         $teachers = [];
         foreach ($rows as $row) {
