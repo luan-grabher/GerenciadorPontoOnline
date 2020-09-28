@@ -5,6 +5,11 @@ namespace App;
 use Goutte\Client;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\DomCrawler\Crawler;
+use App\Customer;
+use App\Sale;
+use App\SaleItem;
+use App\Product;
+use App\ProductTeacher;
 
 class ERP_Importation extends Model
 {
@@ -69,6 +74,8 @@ class ERP_Importation extends Model
     private array $products = [];
     private array $customers = [];
 
+    private array $imported = ['products'=>[],'customers'=>[],'sales'=>[]];
+
     /**
      * ImportERP constructor.
      * @param $dateStart \DateTime format Y-m-d
@@ -96,11 +103,20 @@ class ERP_Importation extends Model
                     if (!isset(($run = $this->erp_createProductList())['error'])) {
                         /*Pega as informações dos produtos da lista*/
                         if (!isset(($run = $this->erp_getInfoProducts())['error'])) {
-                            $run = [
-                                'sales' => $this->sales,
-                                'products' => $this->products,
-                                'customers' => $this->customers
-                            ];
+                            /*Importa produtos pro Database*/
+                            if(!isset(($run = $this->importProducts())['error'])){
+                                /*importa clientes pro Database*/
+                                if(!isset(($run = $this->importCustomers())['error'])){
+                                    /*Importa vendas pro Database*/
+                                    if(!isset(($run = $this->importSales())['error'])){
+                                        $run = [
+                                            "sales" => $this->sales,
+                                            "products" => $this->products,
+                                            "customers" => $this->customers
+                                        ];
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -136,7 +152,7 @@ class ERP_Importation extends Model
         }
     }
 
-    private function erp_getSalesNumber()
+    private function erp_getSalesNumber(): array
     {
         try {
             $page = (int)0;
@@ -210,7 +226,7 @@ class ERP_Importation extends Model
         }
     }
 
-    private function erp_getSaleCustomer(Crawler $response, int $sale)
+    private function erp_getSaleCustomer(Crawler $response, int $sale): array
     {
         $customer = [];
         $customer['cpf'] = $response->filter($this->config['css']['sale']['customer']['cpf'])->text();
@@ -369,5 +385,156 @@ class ERP_Importation extends Model
             }
         }
         return $teachers;
+    }
+
+    public function importCustomers(){
+        try {
+            if(isset($this->customers)){
+                foreach ($this->customers as $customerERP){
+                    $customer = Customer::where('cpf',$customerERP['cpf'])->first();
+
+                    if(is_null($customer) || (!is_null($customer) && $customer->lastSale < $customerERP['sale'])){
+                        $customer = !is_null($customer)?$customer:new Customer();
+
+                        $customer->cpf = $customerERP['cpf'];
+                        $customer->name = $customerERP['name'];
+                        $customer->birthday= \DateTime::createFromFormat('d/m/Y', $customerERP['birthday'])->format('Y-m-d');
+                        $customer->email = $customerERP['email'];
+                        $customer->lastSale = $customerERP['sale'];
+
+                        $customer->save();
+
+                        $this->imported['customers'][$customer->cpf] = $customer->name;
+                    }
+                }
+            }else{
+                throw new \Exception('Customers is not set from Import ERP');
+            }
+            return $this->imported;
+        }catch (\Exception $e){
+            return ArrayError::error('Import Customers to DB',$e);
+        }
+    }
+
+    public function importSales(){
+        try {
+            if(isset($this->sales)){
+                foreach ($this->sales as $saleERP){
+                    $sale = Sale::where('id',$saleERP['saleNumber'])->first();
+                    $sale = !is_null($sale)?$sale:new Sale();
+
+                    $sale->id = $saleERP['saleNumber'];
+                    $sale->profit = (float)((int)filter_var($saleERP['profit'], FILTER_SANITIZE_NUMBER_FLOAT)) / 100;
+                    $sale->date = \DateTime::createFromFormat('d/m/Y H:i:s', $saleERP['date'])->format('Y-m-d');
+                    $sale->paymentDate = \DateTime::createFromFormat('d/m/Y H:i:s', $saleERP['paymentDate'])->format('Y-m-d');
+                    $sale->tid = $saleERP['tid']==""?0:$saleERP['tid'];
+                    $sale->paymentMethod = $saleERP['paymentMethod'];
+                    $sale->installments = $saleERP['installments'];
+                    $sale->canceled = $saleERP['canceled'];
+                    $sale->justificationCancellation = $saleERP['justificationCancellation'];
+                    $sale->creditUsed = (float)((int)filter_var($saleERP['creditUsed'], FILTER_SANITIZE_NUMBER_FLOAT)) / 100;
+                    $sale->customer_cpf = $saleERP['customer']['cpf'];
+
+                    $sale->save();
+
+                    $this->imported['sales'][$sale->id] = [
+                        'id' => $sale->id,
+                        'items' => $this->importSaleItems($saleERP)
+                    ];
+                }
+            }else{
+                throw new \Exception('Sales is not set from Import ERP');
+            }
+            return $this->imported;
+        }catch (\Exception $e){
+            return ArrayError::error('Import Sales to DB',$e);
+        }
+    }
+
+    public function importSaleItems(array $saleERP){
+        try {
+            $imported = [];
+
+            foreach ($saleERP['items'] as $item){
+                $saleItem = SaleItem::where([['product_id',$item['product']],['sale_id',$saleERP['saleNumber']]])->first();
+                $saleItem = !is_null($saleItem)?$saleItem:new SaleItem();
+
+                $saleItem->product_id = $item['product'];
+                $saleItem->sale_id = $saleERP['saleNumber'];
+                $saleItem->status = $item['status'];
+                $saleItem->value = $item['value'];
+                $saleItem->discount = $item['discount'];
+                $saleItem->creditUsed = $item['creditUsed'];
+                $saleItem->creditAdded = $item['creditAdded'];
+                $saleItem->reversed = $item['reversed'];
+                $saleItem->description = $item['description'];
+                $saleItem->save();
+
+                $imported[$saleItem->product_id] = $saleItem->product_id;
+            }
+
+            return $imported;
+        }catch(\Exception $e){
+            return ArrayError::string('Import Sale Items to DB',$e->getMessage(). " - " . $e->getTraceAsString());
+        }
+    }
+
+    public function importProducts():array{
+        try {
+            if(isset($this->products) && is_array($this->products) && sizeof($this->products) > 0){
+                foreach ($this->products as $productERP){
+                    $product = Product::where('id',$productERP['code'])->first();
+                    $product = ! $product == null? $product : new Product();
+
+                    $product->id = $productERP['code'];
+                    $product->name = $productERP['name'];
+                    $product->value = $productERP['value'];
+                    $product->dateStart = \DateTime::createFromFormat('d/m/Y H:i:s',$productERP['dateStart'])->format('Y-m-d');
+                    $product->dateEnd = \DateTime::createFromFormat('d/m/Y H:i:s',$productERP['dateEnd'])->format('Y-m-d');
+                    $product->status = $productERP['status'];
+                    $product->type = $productERP['type'];
+                    $product->dateUnavailability = \DateTime::createFromFormat('d/m/Y H:i:s',$productERP['dateUnavailability'])->format('Y-m-d');
+
+                    $product->save();
+                    $this->imported['products'][$productERP['code']]['code'] = $productERP['code'];
+
+                    //Teachers
+                    $this->imported['products'][$productERP['code']]['teachers'] =
+                        $this->importProductTeachers($productERP['code'],$productERP['teachers']);
+                }
+            }else{
+                throw new \Exception("Products is not set in importation of ERP.");
+            }
+
+            return $this->imported;
+        }catch(\Exception $e){
+            return ArrayError::error('Import Product to DB', $e);
+        }
+    }
+    public function importProductTeachers(int $product, array  $teachers){
+        try {
+            $importedTeachers = [];
+
+            foreach ($teachers as $teacherERP){
+                $teacher = ProductTeacher::where([
+                    ['product_id',$product],
+                    ['name',$teacherERP['name']]
+                ])->first();
+                $teacher = !is_null($teacher)?$teacher:new ProductTeacher();
+
+                $teacher->product_id = $product;
+                $teacher->name = $teacherERP['name'];
+                $teacher->percent = $teacherERP['percent'];
+                $teacher->classes = $teacherERP['classes'];
+
+                $teacher->save();
+
+                $importedTeachers[] = $teacherERP['name'];
+            }
+
+            return $importedTeachers;
+        }catch(\Exception $e){
+            return ArrayError::error('Import Product Teachers to DB',$e);
+        }
     }
 }

@@ -59,7 +59,7 @@ Route::group(['prefix' => __('import')], function () {
         Route::get('vendas', function(){
             return view('layouts.import',['title'=>"Importar ERP Vendas",'button_name' => "Importar"]);
         })->name('import.erp.vendas');
-        Route::post('vendas', 'ErpController@importVendasFromERP')->name('import.erp.vendas.post');
+        Route::post('vendas', 'ErpController@importERPSalesInRangeDate')->name('import.erp.vendas.post');
     });
 });
 
