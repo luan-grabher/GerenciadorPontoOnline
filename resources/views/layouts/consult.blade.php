@@ -12,7 +12,7 @@
             </div>
         @endif
         @if(isset($results))
-            {{view('layouts.table',['data'=>$results])}}
+            {{view('layouts.table',['data'=>$results,'columnsToSum'=>$columnsToSum])}}
         @endif
     </div>
 @endsection

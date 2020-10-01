@@ -92,6 +92,31 @@ class PagarmeController extends Controller
                     'Início'=>$dates['start'],
                     'Fim'=>$dates['end'],
                 ]
-            ]);
+            ]
+        );
+    }
+
+    public function selectReportReceivables(RangeDateRequest $req){
+        $start = $req->input('inicio');
+        $end = $req->input('fim');
+
+        $search = PagarmeVenda::
+        select(['tid','cliente','status','parcelas','valor']
+        )->selectRaw("
+            concat('R$',FORMAT(valor/100,2,'de_DE')) as 'valor'
+        ")->get();
+
+        return view('layouts.consult',
+            ['title'=>'Pagarme A Receber',
+                'results' => $search->toArray(),
+                'filters'=>[
+                    'Início'=>$start,
+                    'Fim'=>$end,
+                ],
+                'columnsToSum' => [
+                    'valor' => 0.0
+                ]
+            ]
+        );
     }
 }

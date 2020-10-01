@@ -87,6 +87,15 @@ Route::group(['prefix' => __('consult')], function () {
     });
 });
 
+Route::group(['prefix'=>'pagarme'],function(){
+   Route::group(['prefix'=>'reports'],function(){
+       Route::group(['prefix'=>'receivable'],function(){
+            Route::get('',function(){return view('layouts.searchWithRange',['title'=>'Pagarme A Receber']);})->name('pagarme.reports.receivable');
+            Route::post('','PagarmeController@selectReportReceivables');
+       });
+   });
+});
+
 Route::group(['prefix' => __('analysis')], function () {
     Route::group(['prefix' => 'balances'], function(){
         Route::group(['prefix'=>'tid'], function(){
