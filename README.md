@@ -5,5 +5,4 @@ de retiradas no sistema contábil e substitui esses lançamentos pelos lançamen
 detalhados.
 
 ### Documentation (PT-Br):
-=====================================
 <a href="https://sites.google.com/view/documentacaogpo/">Docs on google Sites</a>
